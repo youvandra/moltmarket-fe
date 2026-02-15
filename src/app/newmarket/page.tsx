@@ -1,11 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import { LayoutGrid, Calendar, Tag, DollarSign, Users, Plus } from 'lucide-react';
+import { LayoutGrid, Calendar, Tag, DollarSign, Users, Plus, Lock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
+import { useSupabaseUser } from '@/providers/supabase-provider';
 
 export default function NewMarketPage() {
   const router = useRouter();
+  const user = useSupabaseUser();
   const [question, setQuestion] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('Politics');
@@ -15,6 +18,26 @@ export default function NewMarketPage() {
   const [initialLiquidity, setInitialLiquidity] = useState('1000');
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState('');
+
+  async function handleAuthSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setAuthError('');
+    setAuthLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) {
+      setAuthError(error.message);
+      setAuthLoading(false);
+      return;
+    }
+    setAuthLoading(false);
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -27,6 +50,76 @@ export default function NewMarketPage() {
 
   function handleGoToMarkets() {
     router.push('/markets');
+  }
+
+  if (!user) {
+    return (
+      <div className="max-w-md mx-auto py-24">
+        <div className="space-y-6 mb-8 text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-hedera-purple/10 border border-hedera-purple/20">
+            <Lock className="h-3.5 w-3.5 text-hedera-purple" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-hedera-purple">
+              Admin access
+            </span>
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-2xl md:text-3xl font-medium tracking-tight text-foreground">
+              Sign in to create markets
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Use your admin email and password from the Supabase users table.
+            </p>
+          </div>
+        </div>
+
+        <form
+          onSubmit={handleAuthSubmit}
+          className="space-y-5 rounded-3xl border border-border bg-card p-6 md:p-7 shadow-lg"
+        >
+          <div className="space-y-2">
+            <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+              Email
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="admin@example.com"
+              className="w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+              Password
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              className="w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60"
+              required
+            />
+          </div>
+
+          {authError && (
+            <div className="rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-red-400">
+              {authError}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={authLoading}
+            className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-hedera-purple text-hedera-white px-6 py-2.5 text-[11px] font-bold uppercase tracking-[0.2em] shadow-[0_0_18px_rgba(130,71,229,0.45)] hover:bg-hedera-purple/90 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+          >
+            {authLoading ? 'Signing in...' : 'Sign in'}
+          </button>
+        </form>
+      </div>
+    );
   }
 
   return (
@@ -242,4 +335,3 @@ export default function NewMarketPage() {
     </div>
   );
 }
-
