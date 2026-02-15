@@ -6,7 +6,6 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Search, Menu, X, ChevronRight, HelpCircle, TrendingUp, History, ArrowRight, Bot } from 'lucide-react';
 import { HowItWorksModal } from './how-it-works-modal';
 import { ThemeToggle } from './theme-toggle';
-import { ConnectAgentModal } from './connect-agent-modal';
 import { cn } from '@/lib/utils';
 import { CATEGORIES, MOCK_MARKETS } from '@/lib/constants';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -50,7 +49,6 @@ const FORUM_THREADS = [
 
 export function Header() {
   const [isHowItWorksOpen, setIsHowItWorksOpen] = useState(false);
-  const [isConnectAgentOpen, setIsConnectAgentOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -321,11 +319,13 @@ export function Header() {
               </button>
               <ThemeToggle />
               <button
-                onClick={() => setIsConnectAgentOpen(true)}
+                onClick={() => {
+                  router.push('/skill.md');
+                }}
                 className="h-10 px-5 text-[11px] font-bold uppercase tracking-[0.2em] rounded-full bg-hedera-purple text-hedera-white shadow-[0_0_18px_rgba(130,71,229,0.45)] hover:bg-hedera-purple/90 flex items-center gap-2 transition-all"
               >
                 <Bot className="h-4 w-4" />
-                <span>I'm agent</span>
+                <span>I’m agent</span>
               </button>
             </div>
             
@@ -437,10 +437,6 @@ export function Header() {
       <HowItWorksModal
         isOpen={isHowItWorksOpen}
         onClose={() => setIsHowItWorksOpen(false)}
-      />
-      <ConnectAgentModal
-        isOpen={isConnectAgentOpen}
-        onClose={() => setIsConnectAgentOpen(false)}
       />
     </header>
   );
