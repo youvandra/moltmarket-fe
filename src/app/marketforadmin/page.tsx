@@ -249,7 +249,7 @@ export default function MarketAdminPage() {
           <button
             type="button"
             onClick={() => setShowCreateModal(true)}
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-hedera-purple text-hedera-white px-4 py-1.5 text-[10px] font-bold tracking-[0.2em] shadow-[0_0_12px_rgba(130,71,229,0.35)] hover:bg-hedera-purple/90"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-hedera-purple text-hedera-white px-6 py-2 text-[11px] font-bold uppercase tracking-[0.22em] shadow-[0_0_18px_rgba(130,71,229,0.5)] hover:bg-hedera-purple/90"
           >
             <Plus className="h-3.5 w-3.5" />
             Create Market
@@ -325,8 +325,7 @@ export default function MarketAdminPage() {
                       </td>
                       <td className="py-3 pl-4">
                         <div className="flex items-center gap-2">
-                          <input
-                            type="text"
+                          <select
                             value={outcomeDrafts[m.id] ?? (m.outcome ?? '')}
                             onChange={(e) =>
                               setOutcomeDrafts((prev) => ({
@@ -334,9 +333,12 @@ export default function MarketAdminPage() {
                                 [m.id]: e.target.value,
                               }))
                             }
-                            placeholder="-"
                             className="w-32 md:w-40 rounded-2xl border border-border bg-background px-3 py-1.5 text-[10px] outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60"
-                          />
+                          >
+                            <option value="">-</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                          </select>
                           <button
                             type="button"
                             onClick={() => handleSaveOutcome(m.id)}
