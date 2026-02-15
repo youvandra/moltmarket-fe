@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #000000;
+  --hedera-black: #000000;
+  --hedera-white: #ffffff;
+  --hedera-purple: #8247e5;
+  --hedera-blue: #2c3398;
+  --hedera-slate: #f4f4f5;
+  --border: #e2e8f0;
+  --card: #ffffff;
+  --card-foreground: #000000;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+}
+
+.dark {
+  --background: #000000;
+  --foreground: #ffffff;
+  --hedera-slate: #0a0a0a;
+  --border: #1e293b;
+  --card: #0a0a0a;
+  --card-foreground: #ffffff;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-hedera-black: var(--hedera-black);
+  --color-hedera-white: var(--hedera-white);
+  --color-hedera-purple: var(--hedera-purple);
+  --color-hedera-blue: var(--hedera-blue);
+  --color-hedera-slate: var(--hedera-slate);
+  --color-border: var(--border);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+* {
+  border-color: var(--border);
+}
