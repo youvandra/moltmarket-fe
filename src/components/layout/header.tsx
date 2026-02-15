@@ -1,14 +1,14 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Search, Menu, X, ChevronRight, HelpCircle, TrendingUp, History, ArrowRight, Bot } from 'lucide-react';
 import { HowItWorksModal } from './how-it-works-modal';
 import { ThemeToggle } from './theme-toggle';
 import { ConnectAgentModal } from './connect-agent-modal';
 import { cn } from '@/lib/utils';
-import { CATEGORIES } from '@/lib/constants';
+import { CATEGORIES, MOCK_MARKETS } from '@/lib/constants';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const RECOMMENDATIONS = [
@@ -25,6 +25,29 @@ const RECENT_SEARCHES = [
   "Sports"
 ];
 
+const FORUM_THREADS = [
+  {
+    id: '1',
+    title: 'Strategies for building sports prediction agents',
+    category: 'Sports Agents',
+  },
+  {
+    id: '2',
+    title: 'Sharing: architecture for news-reading trading agents',
+    category: 'Research',
+  },
+  {
+    id: '3',
+    title: 'Discussion: how to evaluate agent win-rate on moltmarket',
+    category: 'Research',
+  },
+  {
+    id: '4',
+    title: 'Request: custom tournament markets for the agent community',
+    category: 'Ideas',
+  },
+];
+
 export function Header() {
   const [isHowItWorksOpen, setIsHowItWorksOpen] = useState(false);
   const [isConnectAgentOpen, setIsConnectAgentOpen] = useState(false);
@@ -33,6 +56,33 @@ export function Header() {
   const [searchQuery, setSearchQuery] = useState('');
   const searchRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+  const router = useRouter();
+
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+
+  const marketResults = useMemo(() => {
+    if (!normalizedQuery) return [];
+    return MOCK_MARKETS.filter((market) => {
+      const question = market.question.toLowerCase();
+      const category = market.category.toLowerCase();
+      return (
+        question.includes(normalizedQuery) ||
+        category.includes(normalizedQuery)
+      );
+    }).slice(0, 5);
+  }, [normalizedQuery]);
+
+  const forumResults = useMemo(() => {
+    if (!normalizedQuery) return [];
+    return FORUM_THREADS.filter((thread) => {
+      const title = thread.title.toLowerCase();
+      const category = thread.category.toLowerCase();
+      return (
+        title.includes(normalizedQuery) ||
+        category.includes(normalizedQuery)
+      );
+    }).slice(0, 5);
+  }, [normalizedQuery]);
 
   // Handle click outside search
   useEffect(() => {
@@ -114,7 +164,7 @@ export function Header() {
               </div>
             </div>
 
-            {/* Desktop Search Recommendation Dropdown */}
+            {/* Desktop Search Dropdown */}
             <AnimatePresence>
               {isSearchFocused && (
                 <motion.div
@@ -125,50 +175,134 @@ export function Header() {
                   className="absolute top-[calc(100%+8px)] left-0 right-0 bg-card border border-border rounded-[1.5rem] shadow-2xl overflow-hidden z-[70] backdrop-blur-xl"
                 >
                   <div className="p-5 space-y-6">
-                    {/* Recent Searches */}
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2 px-1">
-                        <History className="h-3.5 w-3.5 text-muted-foreground" />
-                        <h3 className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground">Recent</h3>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {RECENT_SEARCHES.map((item) => (
-                          <button
-                            key={item}
-                            onClick={() => {
-                              setSearchQuery(item);
-                              setIsSearchFocused(false);
-                            }}
-                            className="px-3 py-1.5 rounded-lg bg-muted/50 border border-border/50 text-[12px] font-medium hover:bg-muted transition-all"
-                          >
-                            {item}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
+                    {normalizedQuery.length < 2 ? (
+                      <>
+                        {/* Recent Searches */}
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2 px-1">
+                            <History className="h-3.5 w-3.5 text-muted-foreground" />
+                            <h3 className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground">
+                              Recent
+                            </h3>
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            {RECENT_SEARCHES.map((item) => (
+                              <button
+                                key={item}
+                                onClick={() => {
+                                  setSearchQuery(item);
+                                }}
+                                className="px-3 py-1.5 rounded-lg bg-muted/50 border border-border/50 text-[12px] font-medium hover:bg-muted transition-all"
+                              >
+                                {item}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
 
-                    {/* Recommendations */}
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2 px-1">
-                        <TrendingUp className="h-3.5 w-3.5 text-muted-foreground" />
-                        <h3 className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground">Trending</h3>
-                      </div>
-                      <div className="grid grid-cols-1 gap-1">
-                        {RECOMMENDATIONS.map((text) => (
-                          <button
-                            key={text}
-                            onClick={() => {
-                              setSearchQuery(text);
-                              setIsSearchFocused(false);
-                            }}
-                            className="flex items-center justify-between p-3 rounded-xl bg-muted/20 border border-transparent hover:bg-muted/50 hover:border-border transition-all group text-left"
-                          >
-                            <span className="text-[12px] font-bold text-foreground group-hover:text-hedera-purple transition-colors">{text}</span>
-                            <ArrowRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-                          </button>
-                        ))}
-                      </div>
-                    </div>
+                        {/* Recommendations */}
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2 px-1">
+                            <TrendingUp className="h-3.5 w-3.5 text-muted-foreground" />
+                            <h3 className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground">
+                              Trending
+                            </h3>
+                          </div>
+                          <div className="grid grid-cols-1 gap-1">
+                            {RECOMMENDATIONS.map((text) => (
+                              <button
+                                key={text}
+                                onClick={() => {
+                                  setSearchQuery(text);
+                                }}
+                                className="flex items-center justify-between p-3 rounded-xl bg-muted/20 border border-transparent hover:bg-muted/50 hover:border-border transition-all group text-left"
+                              >
+                                <span className="text-[12px] font-bold text-foreground group-hover:text-hedera-purple transition-colors">
+                                  {text}
+                                </span>
+                                <ArrowRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        {marketResults.length > 0 && (
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2 px-1">
+                              <TrendingUp className="h-3.5 w-3.5 text-muted-foreground" />
+                              <h3 className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground">
+                                Markets
+                              </h3>
+                            </div>
+                            <div className="grid grid-cols-1 gap-1">
+                              {marketResults.map((market) => (
+                                <button
+                                  key={market.id}
+                                  onClick={() => {
+                                    setIsSearchFocused(false);
+                                    setSearchQuery('');
+                                    router.push(`/markets/${market.id}`);
+                                  }}
+                                  className="flex items-center justify-between p-3 rounded-xl bg-muted/20 border border-transparent hover:bg-muted/50 hover:border-border transition-all group text-left"
+                                >
+                                  <div className="flex flex-col">
+                                    <span className="text-[12px] font-bold text-foreground group-hover:text-hedera-purple transition-colors line-clamp-1">
+                                      {market.question}
+                                    </span>
+                                    <span className="text-[10px] text-muted-foreground uppercase tracking-[0.16em] mt-1">
+                                      {market.category} • Market
+                                    </span>
+                                  </div>
+                                  <ArrowRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {forumResults.length > 0 && (
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2 px-1">
+                              <History className="h-3.5 w-3.5 text-muted-foreground" />
+                              <h3 className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground">
+                                Forum
+                              </h3>
+                            </div>
+                            <div className="grid grid-cols-1 gap-1">
+                              {forumResults.map((thread) => (
+                                <button
+                                  key={thread.id}
+                                  onClick={() => {
+                                    setIsSearchFocused(false);
+                                    setSearchQuery('');
+                                    router.push(`/forum/${thread.id}`);
+                                  }}
+                                  className="flex items-center justify-between p-3 rounded-xl bg-muted/20 border border-transparent hover:bg-muted/50 hover:border-border transition-all group text-left"
+                                >
+                                  <div className="flex flex-col">
+                                    <span className="text-[12px] font-bold text-foreground group-hover:text-hedera-purple transition-colors line-clamp-1">
+                                      {thread.title}
+                                    </span>
+                                    <span className="text-[10px] text-muted-foreground uppercase tracking-[0.16em] mt-1">
+                                      {thread.category} • Forum
+                                    </span>
+                                  </div>
+                                  <ArrowRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {marketResults.length === 0 && forumResults.length === 0 && (
+                          <div className="py-6 px-2 text-center text-[12px] text-muted-foreground">
+                            No results. Try another keyword.
+                          </div>
+                        )}
+                      </>
+                    )}
                   </div>
                 </motion.div>
               )}
