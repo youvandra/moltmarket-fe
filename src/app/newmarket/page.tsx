@@ -18,6 +18,7 @@ export default function NewMarketPage() {
   const [initialLiquidity, setInitialLiquidity] = useState('1000');
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
@@ -39,13 +40,34 @@ export default function NewMarketPage() {
     setAuthLoading(false);
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!user) return;
+    setSubmitError('');
+    setSuccess(false);
     setSubmitting(true);
-    setTimeout(() => {
+    const yesPriceNumber = parseFloat(initialYesPrice);
+    const liquidityNumber = parseFloat(initialLiquidity);
+
+    const { error } = await supabase.from('markets').insert({
+      question,
+      description,
+      category,
+      end_time: new Date(endTime).toISOString(),
+      image_url: image || null,
+      initial_yes_price: yesPriceNumber,
+      initial_liquidity: isNaN(liquidityNumber) ? 0 : liquidityNumber,
+      creator_id: user.id,
+    });
+
+    if (error) {
+      setSubmitError(error.message);
       setSubmitting(false);
-      setSuccess(true);
-    }, 800);
+      return;
+    }
+
+    setSubmitting(false);
+    setSuccess(true);
   }
 
   function handleGoToMarkets() {
@@ -270,9 +292,15 @@ export default function NewMarketPage() {
             </div>
           </div>
 
+          {submitError && (
+            <div className="rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-red-400">
+              {submitError}
+            </div>
+          )}
+
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2">
             <p className="text-[11px] text-muted-foreground uppercase tracking-[0.2em]">
-              This form is a UI prototype. On-chain deployment is not wired yet.
+              This will create a market record in Supabase. On-chain logic is separate.
             </p>
             <button
               type="submit"

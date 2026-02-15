@@ -1,12 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import {
   ArrowLeft,
-  Share2,
   Info,
   TrendingUp,
   Users,
@@ -15,7 +14,20 @@ import {
   Copy,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { MOCK_MARKETS } from '@/lib/constants';
+import type { Market } from '@/lib/constants';
+import { supabase } from '@/lib/supabase';
+
+type DbMarket = {
+  id: string;
+  question: string;
+  description: string;
+  category: string;
+  image_url: string | null;
+  end_time: string;
+  initial_yes_price: number;
+  initial_liquidity: number;
+  status: string;
+};
 
 const MOCK_HOLDERS = [
   { side: 'Yes', agent: 'agent_0x1', size: '12,000', share: '34%' },
@@ -28,12 +40,100 @@ export default function MarketDetailPage() {
   const params = useParams();
   const router = useRouter();
   const [copied, setCopied] = useState(false);
- 
-  const market = MOCK_MARKETS.find((m) => m.id === params.id) || MOCK_MARKETS[0];
-  const totalShares = market.outcomes.reduce((acc, outcome) => acc + Math.round(outcome.probability * 10000), 0);
-  const relatedMarkets = MOCK_MARKETS.filter(
-    (m) => m.id !== market.id && m.category === market.category
-  ).slice(0, 3);
+  const [market, setMarket] = useState<Market | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const id = (params as { id: string }).id;
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadMarket() {
+      setLoading(true);
+      setError(null);
+
+      const { data, error } = await supabase
+        .from('markets')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (cancelled) return;
+
+      if (error) {
+        setError(error.message);
+        setMarket(null);
+        setLoading(false);
+        return;
+      }
+
+      const row = data as DbMarket;
+      const yesPrice =
+        typeof row.initial_yes_price === 'number' ? row.initial_yes_price : 0.5;
+      const noPrice = 1 - yesPrice;
+
+      const mapped: Market = {
+        id: row.id,
+        question: row.question,
+        description: row.description,
+        category: row.category,
+        image: row.image_url || undefined,
+        volume:
+          row.initial_liquidity != null ? String(row.initial_liquidity) : '0',
+        participants: 0,
+        endTime: row.end_time,
+        outcomes: [
+          {
+            name: 'Yes',
+            probability: yesPrice,
+            price: yesPrice,
+          },
+          {
+            name: 'No',
+            probability: noPrice,
+            price: noPrice,
+          },
+        ],
+      };
+
+      setMarket(mapped);
+      setLoading(false);
+    }
+
+    if (id) {
+      loadMarket();
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="h-8 w-8 rounded-full border-2 border-hedera-purple border-t-transparent animate-spin" />
+      </div>
+    );
+  }
+
+  if (error || !market) {
+    return (
+      <div className="max-w-2xl mx-auto py-24 text-center space-y-4">
+        <p className="text-sm md:text-base text-muted-foreground">
+          {error ? 'Failed to load market.' : 'Market not found.'}
+        </p>
+        <button
+          onClick={() => router.push('/markets')}
+          className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground hover:border-hedera-purple/60 hover:bg-hedera-purple/5 transition-colors"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          Back to markets
+        </button>
+      </div>
+    );
+  }
 
   const handleCopyId = async () => {
     try {
@@ -92,7 +192,7 @@ export default function MarketDetailPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-12 border-y border-border py-8 md:py-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 border-y border-border py-8 md:py-10">
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <TrendingUp className="h-4 w-4 text-hedera-purple" />
@@ -106,15 +206,6 @@ export default function MarketDetailPage() {
                 <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em]">Agents joined</span>
               </div>
               <p className="text-2xl md:text-3xl font-medium text-foreground tracking-tight">{market.participants}</p>
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <ShieldCheck className="h-4 w-4 text-hedera-purple" />
-                <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em]">Total Shares</span>
-              </div>
-              <p className="text-2xl md:text-3xl font-medium text-foreground tracking-tight">
-                {totalShares.toLocaleString()}
-              </p>
             </div>
           </div>
 
@@ -215,8 +306,7 @@ export default function MarketDetailPage() {
             </div>
           </div>
 
-          {relatedMarkets.length > 0 && (
-            <div className="rounded-2xl border border-border bg-card p-4 md:p-5 space-y-4">
+          <div className="rounded-2xl border border-border bg-card p-4 md:p-5 space-y-4">
               <div className="flex items-center justify-between gap-2">
                 <p className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
                   Related markets
@@ -227,46 +317,8 @@ export default function MarketDetailPage() {
                   </span>
                 </div>
               </div>
-              <div className="space-y-2.5">
-                {relatedMarkets.map((rm) => {
-                  const topOutcome = rm.outcomes?.[0];
-                  const topProb = topOutcome ? Math.round(topOutcome.probability * 100) : null;
-
-                  return (
-                    <Link
-                      key={rm.id}
-                      href={`/markets/${rm.id}`}
-                      className="group flex items-center justify-between gap-3 rounded-2xl px-2 py-2.5 hover:bg-muted/60 transition-colors"
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="relative h-8 w-8 flex-shrink-0 overflow-hidden rounded-xl bg-muted border border-border/60">
-                          {rm.image && (
-                            <Image
-                              src={rm.image}
-                              alt={rm.question}
-                              fill
-                              className="object-cover"
-                            />
-                          )}
-                        </div>
-                        <p className="text-[11px] md:text-sm font-medium text-foreground line-clamp-2 group-hover:text-hedera-purple">
-                          {rm.question}
-                        </p>
-                      </div>
-                      <div className="flex flex-col items-end gap-0.5 flex-shrink-0">
-                        <span className="text-sm md:text-base font-semibold text-foreground">
-                          {topProb !== null ? `${topProb}%` : '--'}
-                        </span>
-                        <span className="text-[9px] md:text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                          Implied
-                        </span>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
+              <div className="space-y-2.5" />
             </div>
-          )}
         </div>
       </div>
 

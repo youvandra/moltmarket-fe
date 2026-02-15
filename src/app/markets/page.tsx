@@ -1,38 +1,134 @@
 'use client';
 
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { MarketCard } from '@/components/markets/market-card';
-import { MOCK_MARKETS } from '@/lib/constants';
+import type { Market } from '@/lib/constants';
+import { supabase } from '@/lib/supabase';
 import { LayoutGrid, TrendingUp, Zap, Clock, Trophy, Globe } from 'lucide-react';
-import { cn } from '@/lib/utils';
+
+type DbMarket = {
+  id: string;
+  question: string;
+  description: string;
+  category: string;
+  image_url: string | null;
+  end_time: string;
+  initial_yes_price: number;
+  initial_liquidity: number;
+  status: string;
+};
 
 function MarketsContent() {
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get('category') || 'All';
+  const [markets, setMarkets] = useState<Market[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredMarkets = categoryParam === 'All' 
-    ? MOCK_MARKETS 
-    : MOCK_MARKETS.filter(m => m.category.toLowerCase() === categoryParam.toLowerCase() || categoryParam === 'Trending');
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadMarkets() {
+      setLoading(true);
+      setError(null);
+
+      let query = supabase
+        .from('markets')
+        .select('*')
+        .eq('status', 'open');
+
+      if (['Sports', 'Politics', 'Crypto', 'Science', 'Other'].includes(categoryParam)) {
+        query = query.eq('category', categoryParam);
+      }
+
+      switch (categoryParam) {
+        case 'Trending':
+          query = query.order('initial_liquidity', { ascending: false });
+          break;
+        case 'Newest':
+          query = query.order('created_at', { ascending: false });
+          break;
+        case 'Closing Soon':
+          query = query.order('end_time', { ascending: true });
+          break;
+        default:
+          query = query.order('created_at', { ascending: false });
+          break;
+      }
+
+      const { data, error } = await query;
+
+      if (cancelled) return;
+
+      if (error) {
+        setError(error.message);
+        setMarkets([]);
+        setLoading(false);
+        return;
+      }
+
+      const mapped: Market[] = (data as DbMarket[]).map((row) => {
+        const yesPrice = typeof row.initial_yes_price === 'number' ? row.initial_yes_price : 0.5;
+        const noPrice = 1 - yesPrice;
+
+        return {
+          id: row.id,
+          question: row.question,
+          description: row.description,
+          category: row.category,
+          image: row.image_url || undefined,
+          volume: row.initial_liquidity != null ? String(row.initial_liquidity) : '0',
+          participants: 0,
+          endTime: row.end_time,
+          outcomes: [
+            {
+              name: 'Yes',
+              probability: yesPrice,
+              price: yesPrice,
+            },
+            {
+              name: 'No',
+              probability: noPrice,
+              price: noPrice,
+            },
+          ],
+        };
+      });
+
+      setMarkets(mapped);
+      setLoading(false);
+    }
+
+    loadMarkets();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [categoryParam]);
 
   const getCategoryIcon = (name: string) => {
     switch (name) {
-      case 'Trending': return TrendingUp;
-      case 'Newest': return Zap;
-      case 'Closing Soon': return Clock;
-      case 'Sports': return Trophy;
-      case 'Politics': return Globe;
-      default: return LayoutGrid;
+      case 'Trending':
+        return <TrendingUp className="h-3.5 w-3.5 text-hedera-purple" />;
+      case 'Newest':
+        return <Zap className="h-3.5 w-3.5 text-hedera-purple" />;
+      case 'Closing Soon':
+        return <Clock className="h-3.5 w-3.5 text-hedera-purple" />;
+      case 'Sports':
+        return <Trophy className="h-3.5 w-3.5 text-hedera-purple" />;
+      case 'Politics':
+        return <Globe className="h-3.5 w-3.5 text-hedera-purple" />;
+      default:
+        return <LayoutGrid className="h-3.5 w-3.5 text-hedera-purple" />;
     }
   };
-
-  const Icon = getCategoryIcon(categoryParam);
 
   return (
     <div className="space-y-8 md:space-y-10">
       <div className="flex flex-col gap-4">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border w-fit bg-transparent">
-          <Icon className="h-3.5 w-3.5 text-hedera-purple" />
+          {getCategoryIcon(categoryParam)}
           <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-foreground">
             {categoryParam} Markets
           </span>
@@ -47,22 +143,36 @@ function MarketsContent() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
-        {filteredMarkets.map((market) => (
-          <MarketCard key={market.id} market={market} />
-        ))}
-      </div>
-
-      {filteredMarkets.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-20 text-center space-y-4 rounded-3xl border border-border bg-muted/30">
-          <div className="p-4 rounded-full bg-muted">
-            <LayoutGrid className="h-8 w-8 text-muted-foreground/30" />
-          </div>
-          <div className="space-y-1">
-            <p className="text-foreground font-medium">No markets found</p>
-            <p className="text-muted-foreground text-sm">Try selecting a different category.</p>
-          </div>
+      {error && (
+        <div className="rounded-3xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-[11px] font-bold uppercase tracking-[0.2em] text-red-400">
+          Failed to load markets: {error}
         </div>
+      )}
+
+      {loading ? (
+        <div className="flex items-center justify-center min-h-[300px]">
+          <div className="h-8 w-8 rounded-full border-2 border-hedera-purple border-t-transparent animate-spin" />
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
+            {markets.map((market) => (
+              <MarketCard key={market.id} market={market} />
+            ))}
+          </div>
+
+          {markets.length === 0 && !error && (
+            <div className="flex flex-col items-center justify-center py-20 text-center space-y-4 rounded-3xl border border-border bg-muted/30">
+              <div className="p-4 rounded-full bg-muted">
+                <LayoutGrid className="h-8 w-8 text-muted-foreground/30" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-foreground font-medium">No markets found</p>
+                <p className="text-muted-foreground text-sm">Try selecting a different category.</p>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -70,11 +180,13 @@ function MarketsContent() {
 
 export default function MarketsPage() {
   return (
-    <Suspense fallback={
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="h-8 w-8 rounded-full border-2 border-hedera-purple border-t-transparent animate-spin" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="h-8 w-8 rounded-full border-2 border-hedera-purple border-t-transparent animate-spin" />
+        </div>
+      }
+    >
       <MarketsContent />
     </Suspense>
   );
