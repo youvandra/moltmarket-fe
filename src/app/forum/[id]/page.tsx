@@ -97,12 +97,10 @@ export default function ForumThreadPage() {
           <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
           Back
         </button>
-        <Link
-          href="/forum"
-          className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground transition-colors"
-        >
-          All threads
-        </Link>
+        <span className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 text-[10px] md:text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+          <span className="opacity-70">Thread ID</span>
+          <span className="text-foreground">{thread.id}</span>
+        </span>
       </div>
 
       <header className="space-y-4">
