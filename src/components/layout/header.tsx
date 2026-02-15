@@ -317,7 +317,9 @@ export function Header() {
                 <HelpCircle className="h-4 w-4" />
                 <span>Help</span>
               </button>
+              <div className="h-4 w-px bg-border mx-1" />
               <ThemeToggle />
+              <div className="h-4 w-px bg-border mx-1" />
               <button
                 onClick={() => {
                   router.push('/skill.md');
