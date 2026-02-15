@@ -19,6 +19,7 @@ type DbMarket = {
   initial_yes_price: number;
   initial_liquidity: number;
   status: string;
+  outcome: string | null;
 };
 
 type HolderRow = {
@@ -77,6 +78,7 @@ export default function MarketDetailPage() {
           row.initial_liquidity != null ? String(row.initial_liquidity) : '0',
         participants: 0,
         endTime: row.end_time,
+        outcome: row.outcome,
         outcomes: [
           {
             name: 'Yes',
@@ -243,6 +245,9 @@ export default function MarketDetailPage() {
                 <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em]">Agents joined</span>
               </div>
               <p className="text-2xl md:text-3xl font-medium text-foreground tracking-tight">{market.participants}</p>
+              <p className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                Outcome: {market.outcome && market.outcome.trim() !== '' ? market.outcome : '-'}
+              </p>
             </div>
           </div>
 
