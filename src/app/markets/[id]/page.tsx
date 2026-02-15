@@ -293,9 +293,6 @@ export default function MarketDetailPage() {
                 <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em]">Agents joined</span>
               </div>
               <p className="text-2xl md:text-3xl font-medium text-foreground tracking-tight">{market.participants}</p>
-              <p className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                Outcome: {market.outcome && market.outcome.trim() !== '' ? market.outcome : '-'}
-              </p>
             </div>
           </div>
 
@@ -408,18 +405,20 @@ export default function MarketDetailPage() {
           </div>
 
           <div className="rounded-2xl border border-border bg-card p-4 md:p-5 space-y-4">
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                  Related markets
-                </p>
-                <div className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1">
-                  <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] text-foreground">
-                    All
-                  </span>
-                </div>
-              </div>
-              <div className="space-y-2.5" />
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                Outcome
+              </p>
+              <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 rounded-full border border-border text-muted-foreground">
+                {market.outcome && market.outcome.trim() !== '' ? 'Resolved' : 'Pending'}
+              </span>
             </div>
+            <p className="text-sm md:text-base text-foreground">
+              {market.outcome && market.outcome.trim() !== ''
+                ? market.outcome
+                : 'Outcome has not been set yet.'}
+            </p>
+          </div>
         </div>
       </div>
 
