@@ -14,6 +14,8 @@ type AdminMarketRow = {
   initial_liquidity: number | null;
   status: string;
   outcome: string | null;
+  option_a: string;
+  option_b: string;
 };
 
 export default function MarketAdminPage() {
@@ -24,6 +26,8 @@ export default function MarketAdminPage() {
   const [category, setCategory] = useState('Politics');
   const [endTime, setEndTime] = useState('');
   const [image, setImage] = useState('');
+  const [optionA, setOptionA] = useState('Yes');
+  const [optionB, setOptionB] = useState('No');
   const [initialYesPrice, setInitialYesPrice] = useState('0.5');
   const [initialLiquidity, setInitialLiquidity] = useState('1000');
   const [submitting, setSubmitting] = useState(false);
@@ -61,7 +65,7 @@ export default function MarketAdminPage() {
     setMarketsError('');
     const { data, error } = await supabase
       .from('markets')
-      .select('id, question, category, end_time, initial_liquidity, status, outcome')
+      .select('id, question, category, end_time, initial_liquidity, status, outcome, option_a, option_b')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -98,6 +102,8 @@ export default function MarketAdminPage() {
       image_url: image || null,
       initial_yes_price: yesPriceNumber,
       initial_liquidity: isNaN(liquidityNumber) ? 0 : liquidityNumber,
+      option_a: optionA && optionA.trim() !== '' ? optionA.trim() : 'Option A',
+      option_b: optionB && optionB.trim() !== '' ? optionB.trim() : 'Option B',
       creator_id: user.id,
     });
 
@@ -114,6 +120,8 @@ export default function MarketAdminPage() {
     setCategory('Politics');
     setEndTime('');
     setImage('');
+    setOptionA('Yes');
+    setOptionB('No');
     setInitialYesPrice('0.5');
     setInitialLiquidity('1000');
     loadMarkets();
@@ -336,8 +344,8 @@ export default function MarketAdminPage() {
                             className="w-32 md:w-40 rounded-2xl border border-border bg-background px-3 py-1.5 text-[10px] outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60"
                           >
                             <option value="">-</option>
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
+                            {m.option_a && <option value={m.option_a}>{m.option_a}</option>}
+                            {m.option_b && <option value={m.option_b}>{m.option_b}</option>}
                           </select>
                           <button
                             type="button"
@@ -461,9 +469,31 @@ export default function MarketAdminPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                     <div className="space-y-2">
+                      <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                        Options
+                      </label>
+                      <div className="grid grid-cols-1 gap-2">
+                        <input
+                          type="text"
+                          value={optionA}
+                          onChange={(e) => setOptionA(e.target.value)}
+                          placeholder="Option A (e.g. Michael Jordan)"
+                          className="w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60"
+                        />
+                        <input
+                          type="text"
+                          value={optionB}
+                          onChange={(e) => setOptionB(e.target.value)}
+                          placeholder="Option B (e.g. Trump)"
+                          className="w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
                       <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground inline-flex items-center gap-1">
                         <DollarSign className="h-3.5 w-3.5 text-muted-foreground" />
-                        Initial YES price
+                        Initial {optionA || 'Option A'} price
                       </label>
                       <input
                         type="number"
@@ -474,6 +504,24 @@ export default function MarketAdminPage() {
                         onChange={(e) => setInitialYesPrice(e.target.value)}
                         className="w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60"
                         required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                    <div className="space-y-2">
+                      <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                        Initial {optionB || 'Option B'} price
+                      </label>
+                      <input
+                        type="text"
+                        value={
+                          initialYesPrice
+                            ? (1 - parseFloat(initialYesPrice) || 0).toFixed(2)
+                            : '0.50'
+                        }
+                        readOnly
+                        className="w-full rounded-2xl border border-border bg-muted px-4 py-2.5 text-sm outline-none"
                       />
                     </div>
                     <div className="space-y-2">
@@ -534,13 +582,13 @@ export default function MarketAdminPage() {
                     </div>
                     <div className="grid grid-cols-3 gap-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
                       <div className="space-y-1">
-                        <p className="font-bold">End time</p>
+                      <p className="font-bold">End time</p>
                         <p className="font-mono text-[10px]">
                           {endTime || 'TBD'}
                         </p>
                       </div>
                       <div className="space-y-1">
-                        <p className="font-bold">Yes price</p>
+                      <p className="font-bold">{optionA || 'Option A'} price</p>
                         <p className="font-mono text-[10px]">
                           {initialYesPrice ? Number(initialYesPrice).toFixed(2) : '0.50'}
                         </p>

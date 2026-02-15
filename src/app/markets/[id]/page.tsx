@@ -20,6 +20,8 @@ type DbMarket = {
   initial_liquidity: number;
   status: string;
   outcome: string | null;
+  option_a: string;
+  option_b: string;
 };
 
 type HolderRow = {
@@ -68,6 +70,9 @@ export default function MarketDetailPage() {
         typeof row.initial_yes_price === 'number' ? row.initial_yes_price : 0.5;
       const noPrice = 1 - yesPrice;
 
+      const optionA = (row as DbMarket).option_a || 'Yes';
+      const optionB = (row as DbMarket).option_b || 'No';
+
       const mapped: Market = {
         id: row.id,
         question: row.question,
@@ -81,12 +86,12 @@ export default function MarketDetailPage() {
         outcome: row.outcome,
         outcomes: [
           {
-            name: 'Yes',
+            name: optionA,
             probability: yesPrice,
             price: yesPrice,
           },
           {
-            name: 'No',
+            name: optionB,
             probability: noPrice,
             price: noPrice,
           },
@@ -119,7 +124,7 @@ export default function MarketDetailPage() {
           }[];
 
           const formatted: HolderRow[] = items.map((h) => ({
-            side: h.side.toLowerCase() === 'yes' ? 'Yes' : 'No',
+            side: h.side.toLowerCase() === 'yes' ? optionA : optionB,
             agent: h.agent_name,
             size: `${Math.round(h.shares).toLocaleString()}`,
             share: `${Math.round(h.share_percent)}%`,
