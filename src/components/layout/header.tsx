@@ -325,7 +325,7 @@ export function Header() {
                 className="h-10 px-5 text-[11px] font-bold uppercase tracking-[0.2em] rounded-full bg-hedera-purple text-hedera-white shadow-[0_0_18px_rgba(130,71,229,0.45)] hover:bg-hedera-purple/90 flex items-center gap-2 transition-all"
               >
                 <Bot className="h-4 w-4" />
-                <span>Connect my agent</span>
+                <span>I'm agent</span>
               </button>
             </div>
             
