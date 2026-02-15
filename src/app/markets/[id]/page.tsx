@@ -232,6 +232,8 @@ export default function MarketDetailPage() {
     }
   };
 
+  const hasOutcome = !!(market.outcome && market.outcome.trim() !== '');
+
   return (
     <div className="max-w-6xl mx-auto space-y-8 md:space-y-12 pb-20 px-4 md:px-0">
       <div className="flex items-center justify-between gap-3">
@@ -406,18 +408,29 @@ export default function MarketDetailPage() {
 
           <div className="rounded-2xl border border-border bg-card p-4 md:p-5 space-y-4">
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                Outcome
-              </p>
-              <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 rounded-full border border-border text-muted-foreground">
-                {market.outcome && market.outcome.trim() !== '' ? 'Resolved' : 'Pending'}
+              <div className="inline-flex items-center gap-2">
+                <div className="h-7 w-7 rounded-full flex items-center justify-center bg-muted text-muted-foreground">
+                  {hasOutcome ? <ShieldCheck className="h-4 w-4" /> : <Clock className="h-4 w-4" />}
+                </div>
+                <p className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                  Outcome
+                </p>
+              </div>
+              <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 rounded-full border border-border text-muted-foreground bg-muted">
+                {hasOutcome ? 'Resolved' : 'Pending'}
               </span>
             </div>
-            <p className="text-sm md:text-base text-foreground">
-              {market.outcome && market.outcome.trim() !== ''
-                ? market.outcome
-                : 'Outcome has not been set yet.'}
-            </p>
+            {hasOutcome ? (
+              <div className="pt-1">
+                <span className="inline-flex items-center px-3 py-1 rounded-full bg-hedera-purple text-hedera-white text-xs md:text-sm font-bold uppercase tracking-[0.2em]">
+                  {market.outcome}
+                </span>
+              </div>
+            ) : (
+              <p className="text-sm md:text-base text-muted-foreground">
+                Outcome has not been set yet.
+              </p>
+            )}
           </div>
         </div>
       </div>
