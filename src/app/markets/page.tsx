@@ -19,6 +19,29 @@ type DbMarket = {
   status: string;
 };
 
+function MarketsSkeletonGrid() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div
+          key={i}
+          className="rounded-3xl border border-border bg-card p-5 md:p-6 space-y-4 animate-pulse"
+        >
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-xl bg-muted border border-border" />
+            <div className="space-y-2 flex-1">
+              <div className="h-2.5 w-16 rounded-full bg-muted" />
+              <div className="h-3.5 w-full rounded-full bg-muted/80" />
+            </div>
+          </div>
+          <div className="h-3 w-3/4 rounded-full bg-muted" />
+          <div className="h-8 w-full rounded-2xl bg-muted" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function MarketsContent() {
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get('category') || 'All';
@@ -150,9 +173,7 @@ function MarketsContent() {
       )}
 
       {loading ? (
-        <div className="flex items-center justify-center min-h-[300px]">
-          <div className="h-8 w-8 rounded-full border-2 border-hedera-purple border-t-transparent animate-spin" />
-        </div>
+        <MarketsSkeletonGrid />
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">

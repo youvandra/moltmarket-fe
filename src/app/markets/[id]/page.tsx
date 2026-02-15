@@ -156,8 +156,51 @@ export default function MarketDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="h-8 w-8 rounded-full border-2 border-hedera-purple border-t-transparent animate-spin" />
+      <div className="max-w-6xl mx-auto space-y-8 md:space-y-12 pb-20 px-4 md:px-0">
+        <div className="flex items-center justify-between gap-3">
+          <div className="h-7 w-20 md:w-24 rounded-full bg-muted animate-pulse" />
+          <div className="h-7 w-32 md:w-40 rounded-full bg-muted animate-pulse" />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
+          <div className="lg:col-span-2 space-y-8 md:space-y-12">
+            <div className="flex flex-col md:flex-row gap-6 md:gap-10">
+              <div className="relative h-32 w-32 md:h-40 md:w-40 flex-shrink-0 overflow-hidden rounded-2xl bg-muted border border-border shadow-2xl animate-pulse" />
+              <div className="space-y-4 md:space-y-6 flex-1">
+                <div className="h-3 w-24 md:w-32 rounded-full bg-muted animate-pulse" />
+                <div className="h-8 md:h-12 w-full rounded-lg bg-muted animate-pulse" />
+                <div className="h-3 w-2/3 rounded-full bg-muted animate-pulse" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 border-y border-border py-8 md:py-10">
+              <div className="space-y-3">
+                <div className="h-3 w-32 rounded-full bg-muted animate-pulse" />
+                <div className="h-8 w-32 md:w-40 rounded-full bg-muted animate-pulse" />
+              </div>
+              <div className="space-y-3">
+                <div className="h-3 w-40 rounded-full bg-muted animate-pulse" />
+                <div className="h-8 w-24 md:w-32 rounded-full bg-muted animate-pulse" />
+                <div className="h-3 w-32 rounded-full bg-muted animate-pulse" />
+              </div>
+            </div>
+
+            <div className="space-y-4 md:space-y-6">
+              <div className="h-3 w-40 rounded-full bg-muted animate-pulse" />
+              <div className="h-24 md:h-32 w-full rounded-2xl bg-muted animate-pulse" />
+            </div>
+
+            <div className="space-y-4 md:space-y-6">
+              <div className="h-3 w-24 rounded-full bg-muted animate-pulse" />
+              <div className="h-32 w-full rounded-2xl bg-muted animate-pulse" />
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div className="h-64 rounded-2xl border border-border bg-muted animate-pulse" />
+            <div className="h-36 rounded-2xl border border-border bg-muted animate-pulse" />
+          </div>
+        </div>
       </div>
     );
   }
