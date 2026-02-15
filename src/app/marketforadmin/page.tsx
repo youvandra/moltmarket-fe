@@ -367,8 +367,8 @@ export default function MarketAdminPage() {
       </section>
 
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-          <div className="w-full max-w-4xl rounded-3xl border border-border bg-background shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md px-4">
+          <div className="w-full max-w-4xl max-h-[90vh] rounded-3xl border border-border bg-background shadow-2xl flex flex-col">
             <div className="flex items-center justify-between px-6 md:px-8 py-4 border-b border-border/60">
               <div className="space-y-1">
                 <p className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
@@ -386,8 +386,8 @@ export default function MarketAdminPage() {
                 Close
               </button>
             </div>
-            <div className="p-6 md:p-8">
-              <section className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] gap-8 md:gap-10">
+            <div className="p-6 md:p-8 overflow-y-auto">
+              <section className="max-w-3xl mx-auto">
                 <form
                   onSubmit={handleSubmit}
                   className="space-y-6 md:space-y-8"
@@ -467,29 +467,29 @@ export default function MarketAdminPage() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                    <div className="space-y-2">
-                      <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                        Options
-                      </label>
-                      <div className="grid grid-cols-1 gap-2">
-                        <input
-                          type="text"
-                          value={optionA}
-                          onChange={(e) => setOptionA(e.target.value)}
-                          placeholder="Option A (e.g. Michael Jordan)"
-                          className="w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60"
-                        />
-                        <input
-                          type="text"
-                          value={optionB}
-                          onChange={(e) => setOptionB(e.target.value)}
-                          placeholder="Option B (e.g. Trump)"
-                          className="w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60"
-                        />
-                      </div>
+                  <div className="space-y-2">
+                    <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                      Options
+                    </label>
+                    <div className="grid grid-cols-1 gap-2">
+                      <input
+                        type="text"
+                        value={optionA}
+                        onChange={(e) => setOptionA(e.target.value)}
+                        placeholder="Option A (e.g. Michael Jordan)"
+                        className="w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60"
+                      />
+                      <input
+                        type="text"
+                        value={optionB}
+                        onChange={(e) => setOptionB(e.target.value)}
+                        placeholder="Option B (e.g. Trump)"
+                        className="w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60"
+                      />
                     </div>
+                  </div>
 
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                     <div className="space-y-2">
                       <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground inline-flex items-center gap-1">
                         <DollarSign className="h-3.5 w-3.5 text-muted-foreground" />
@@ -506,9 +506,6 @@ export default function MarketAdminPage() {
                         required
                       />
                     </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                     <div className="space-y-2">
                       <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
                         Initial {optionB || 'Option B'} price
@@ -524,21 +521,22 @@ export default function MarketAdminPage() {
                         className="w-full rounded-2xl border border-border bg-muted px-4 py-2.5 text-sm outline-none"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground inline-flex items-center gap-1">
-                        <Users className="h-3.5 w-3.5 text-muted-foreground" />
-                        Initial liquidity
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        step="10"
-                        value={initialLiquidity}
-                        onChange={(e) => setInitialLiquidity(e.target.value)}
-                        className="w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60"
-                        required
-                      />
-                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground inline-flex items-center gap-1">
+                      <Users className="h-3.5 w-3.5 text-muted-foreground" />
+                      Initial liquidity
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="10"
+                      value={initialLiquidity}
+                      onChange={(e) => setInitialLiquidity(e.target.value)}
+                      className="w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60"
+                      required
+                    />
                   </div>
 
                   {submitError && (
@@ -547,10 +545,7 @@ export default function MarketAdminPage() {
                     </div>
                   )}
 
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2">
-                    <p className="text-[11px] text-muted-foreground uppercase tracking-[0.2em]">
-                      This will create a market record in Supabase. On-chain logic is separate.
-                    </p>
+                  <div className="flex justify-end pt-2">
                     <button
                       type="submit"
                       disabled={submitting}
@@ -561,53 +556,6 @@ export default function MarketAdminPage() {
                     </button>
                   </div>
                 </form>
-
-                <div className="space-y-4 md:space-y-6 rounded-3xl border border-border bg-muted/40 p-6 md:p-8">
-                  <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                    Preview
-                  </h2>
-                  <div className="rounded-2xl border border-border bg-card p-5 md:p-6 space-y-4">
-                    <div className="flex items-center gap-3">
-                      <div className="h-9 w-9 rounded-xl bg-muted flex items-center justify-center border border-border">
-                        <LayoutGrid className="h-4 w-4 text-muted-foreground" />
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                          {category || 'Category'}
-                        </p>
-                        <p className="text-sm font-medium text-foreground line-clamp-2">
-                          {question || 'Your market question will appear here.'}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-3 gap-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-                      <div className="space-y-1">
-                      <p className="font-bold">End time</p>
-                        <p className="font-mono text-[10px]">
-                          {endTime || 'TBD'}
-                        </p>
-                      </div>
-                      <div className="space-y-1">
-                      <p className="font-bold">{optionA || 'Option A'} price</p>
-                        <p className="font-mono text-[10px]">
-                          {initialYesPrice ? Number(initialYesPrice).toFixed(2) : '0.50'}
-                        </p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="font-bold">Liquidity</p>
-                        <p className="font-mono text-[10px]">
-                          {initialLiquidity ? `$${initialLiquidity}` : '$0'}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {success && (
-                    <div className="rounded-2xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-400">
-                      Draft market created. It is now available in the markets list.
-                    </div>
-                  )}
-                </div>
               </section>
             </div>
           </div>
