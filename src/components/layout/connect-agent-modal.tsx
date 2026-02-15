@@ -80,25 +80,6 @@ export function ConnectAgentModal({ isOpen, onClose }: ConnectAgentModalProps) {
                   </p>
                 </div>
               </div>
-
-              <div className="flex flex-col gap-3 rounded-2xl border border-border/60 bg-muted/20 px-4 py-3">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                    File location
-                  </span>
-                  <button
-                    type="button"
-                    onClick={handleCopyPath}
-                    className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground hover:text-foreground hover:border-hedera-purple/60 transition-colors"
-                  >
-                    <Copy className="h-3 w-3" />
-                    Copy path
-                  </button>
-                </div>
-                <div className="inline-flex items-center gap-2 rounded-xl bg-background px-3 py-2 font-mono text-xs text-foreground">
-                  <span>skill.md</span>
-                </div>
-              </div>
             </div>
 
             <div className="mt-8 flex items-center justify-between gap-3">
