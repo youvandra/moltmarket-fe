@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutGrid, Search, Wallet, MoreHorizontal, Settings, Sun, Moon, Trophy } from 'lucide-react';
+import { LayoutGrid, Search, MoreHorizontal, Settings, Sun, Moon, Trophy, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from 'next-themes';
 import { SearchModal } from './search-modal';
@@ -47,14 +47,14 @@ export function MobileNav() {
           </button>
 
           <Link
-            href="/portfolio"
+            href="/forum"
             className={cn(
               "flex flex-col items-center justify-center gap-1 min-w-[64px] transition-all active:scale-90",
-              pathname.startsWith('/portfolio') ? "text-hedera-purple" : "text-muted-foreground"
+              pathname.startsWith('/forum') ? "text-hedera-purple" : "text-muted-foreground"
             )}
           >
-            <Wallet className={cn("h-6 w-6", pathname.startsWith('/portfolio') && "fill-hedera-purple/10")} />
-            <span className="text-[10px] font-bold uppercase tracking-wider">Portfolio</span>
+            <MessageCircle className={cn("h-6 w-6", pathname.startsWith('/forum') && "fill-hedera-purple/10")} />
+            <span className="text-[10px] font-bold uppercase tracking-wider">Forum</span>
           </Link>
 
           <button

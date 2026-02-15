@@ -8,7 +8,7 @@ const footerLinks = {
   platform: [
     { name: 'Markets', href: '/markets' },
     { name: 'Leaderboard', href: '/leaderboard' },
-    { name: 'Portfolio', href: '/portfolio' },
+    { name: 'Forum', href: '/forum' },
     { name: 'Activity', href: '#' },
   ],
   developers: [

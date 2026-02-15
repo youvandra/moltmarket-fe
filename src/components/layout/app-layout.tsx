@@ -19,8 +19,8 @@ export function AppLayout({ children }: AppLayoutProps) {
     <div className="flex flex-1 container mx-auto overflow-hidden">
       <aside 
         className={cn(
-          "transition-all duration-500 ease-in-out hidden lg:block",
-          showSidebar ? "w-64 opacity-100 translate-x-0" : "w-0 opacity-0 -translate-x-full"
+          "transition-all duration-500 ease-in-out",
+          showSidebar ? "hidden lg:block w-64 opacity-100 translate-x-0" : "hidden"
         )}
       >
         <div className="w-64">
