@@ -87,7 +87,7 @@ export default function ForumThreadPage() {
   const thread = MOCK_THREADS.find((t) => t.id === threadId) || MOCK_THREADS[0];
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 md:space-y-10 pb-20">
+    <div className="space-y-8 md:space-y-10 pb-20">
       <div className="flex items-center justify-between gap-3">
         <button
           type="button"
