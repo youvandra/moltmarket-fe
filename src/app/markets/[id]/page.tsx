@@ -4,15 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import {
-  ArrowLeft,
-  Info,
-  TrendingUp,
-  Users,
-  ShieldCheck,
-  Clock,
-  Copy,
-} from 'lucide-react';
+import { ArrowLeft, Info, TrendingUp, Users, ShieldCheck, Clock, Copy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Market } from '@/lib/constants';
 import { supabase } from '@/lib/supabase';
@@ -29,12 +21,12 @@ type DbMarket = {
   status: string;
 };
 
-const MOCK_HOLDERS = [
-  { side: 'Yes', agent: 'agent_0x1', size: '12,000', share: '34%' },
-  { side: 'No', agent: 'agent_0x7', size: '9,500', share: '27%' },
-  { side: 'Yes', agent: 'agent_0x9', size: '6,200', share: '18%' },
-  { side: 'No', agent: 'agent_0x3', size: '4,100', share: '11%' },
-];
+type HolderRow = {
+  side: 'Yes' | 'No';
+  agent: string;
+  size: string;
+  share: string;
+};
 
 export default function MarketDetailPage() {
   const params = useParams();
@@ -43,6 +35,8 @@ export default function MarketDetailPage() {
   const [market, setMarket] = useState<Market | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [holders, setHolders] = useState<HolderRow[]>([]);
+  const [holdersLoading, setHoldersLoading] = useState(false);
 
   const id = (params as { id: string }).id;
 
@@ -98,6 +92,49 @@ export default function MarketDetailPage() {
       };
 
       setMarket(mapped);
+
+      const functionsBaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      if (!functionsBaseUrl) {
+        return;
+      }
+
+      setHoldersLoading(true);
+
+      try {
+        const res = await fetch(
+          `${functionsBaseUrl}/functions/v1/get_market_holders?market_id=${encodeURIComponent(row.id)}`,
+        );
+
+        if (!res.ok) {
+          setHolders([]);
+        } else {
+          const json = await res.json();
+          const items = (json?.holders ?? []) as {
+            agent_name: string;
+            side: string;
+            shares: number;
+            share_percent: number;
+          }[];
+
+          const formatted: HolderRow[] = items.map((h) => ({
+            side: h.side.toLowerCase() === 'yes' ? 'Yes' : 'No',
+            agent: h.agent_name,
+            size: `${Math.round(h.shares).toLocaleString()}`,
+            share: `${Math.round(h.share_percent)}%`,
+          }));
+
+          setHolders(formatted);
+
+          const uniqueAgents = new Set(items.map((h) => h.agent_name));
+          setMarket((prev) =>
+            prev ? { ...prev, participants: uniqueAgents.size } : prev,
+          );
+        }
+      } catch {
+        setHolders([]);
+      } finally {
+        setHoldersLoading(false);
+      }
       setLoading(false);
     }
 
@@ -233,34 +270,45 @@ export default function MarketDetailPage() {
                 <span className="text-right">Share</span>
               </div>
               <div className="divide-y divide-border/60">
-                {MOCK_HOLDERS.map((holder) => (
-                  <div
-                    key={`${holder.agent}-${holder.side}`}
-                    className="grid grid-cols-[minmax(0,0.6fr)_minmax(0,1.4fr)_minmax(0,0.8fr)_minmax(0,0.8fr)] gap-3 items-center px-2 py-3 text-[11px]"
-                  >
-                    <div>
-                      <span
-                        className={cn(
-                          'inline-flex px-3 py-1 rounded-full text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em]',
-                          holder.side === 'Yes'
-                            ? 'bg-hedera-purple/10 text-hedera-purple'
-                            : 'bg-muted text-muted-foreground'
-                        )}
-                      >
-                        {holder.side}
-                      </span>
-                    </div>
-                    <div className="font-mono text-xs md:text-sm text-foreground truncate">
-                      {holder.agent}
-                    </div>
-                    <div className="text-[10px] md:text-xs font-medium text-muted-foreground text-right uppercase tracking-[0.18em]">
-                      {holder.size} shares
-                    </div>
-                    <div className="text-[10px] md:text-xs font-medium text-muted-foreground text-right uppercase tracking-[0.18em]">
-                      {holder.share}
-                    </div>
+                {holdersLoading && (
+                  <div className="px-2 py-3 text-[11px] text-muted-foreground">
+                    Loading holders...
                   </div>
-                ))}
+                )}
+                {!holdersLoading && holders.length === 0 && (
+                  <div className="px-2 py-3 text-[11px] text-muted-foreground">
+                    No agents have joined this market yet.
+                  </div>
+                )}
+                {!holdersLoading &&
+                  holders.map((holder) => (
+                    <div
+                      key={`${holder.agent}-${holder.side}`}
+                      className="grid grid-cols-[minmax(0,0.6fr)_minmax(0,1.4fr)_minmax(0,0.8fr)_minmax(0,0.8fr)] gap-3 items-center px-2 py-3 text-[11px]"
+                    >
+                      <div>
+                        <span
+                          className={cn(
+                            'inline-flex px-3 py-1 rounded-full text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em]',
+                            holder.side === 'Yes'
+                              ? 'bg-hedera-purple/10 text-hedera-purple'
+                              : 'bg-muted text-muted-foreground',
+                          )}
+                        >
+                          {holder.side}
+                        </span>
+                      </div>
+                      <div className="font-mono text-xs md:text-sm text-foreground truncate">
+                        {holder.agent}
+                      </div>
+                      <div className="text-[10px] md:text-xs font-medium text-muted-foreground text-right uppercase tracking-[0.18em]">
+                        {holder.size} shares
+                      </div>
+                      <div className="text-[10px] md:text-xs font-medium text-muted-foreground text-right uppercase tracking-[0.18em]">
+                        {holder.share}
+                      </div>
+                    </div>
+                  ))}
               </div>
             </div>
           </div>
