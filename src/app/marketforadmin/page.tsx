@@ -38,6 +38,7 @@ export default function MarketAdminPage() {
   const [marketsError, setMarketsError] = useState('');
   const [outcomeDrafts, setOutcomeDrafts] = useState<Record<string, string>>({});
   const [savingOutcomeId, setSavingOutcomeId] = useState<string | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   async function handleAuthSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -247,6 +248,14 @@ export default function MarketAdminPage() {
           </div>
           <button
             type="button"
+            onClick={() => setShowCreateModal(true)}
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-hedera-purple text-hedera-white px-4 py-1.5 text-[10px] font-bold tracking-[0.2em] shadow-[0_0_12px_rgba(130,71,229,0.35)] hover:bg-hedera-purple/90"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            Create Market
+          </button>
+          <button
+            type="button"
             onClick={handleGoToMarkets}
             className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground underline-offset-4 hover:underline"
           >
@@ -345,190 +354,215 @@ export default function MarketAdminPage() {
           </div>
         </div>
 
-        <section className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] gap-8 md:gap-10">
-          <form
-            onSubmit={handleSubmit}
-            className="space-y-6 md:space-y-8 rounded-3xl border border-border bg-card p-6 md:p-8 shadow-lg"
-          >
-            <div className="space-y-2">
-              <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                Market question
-              </label>
-              <textarea
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-                placeholder="Who will win the 2024 US Presidential Election?"
-                rows={3}
-                className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm md:text-[15px] outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60 resize-none"
-                required
-              />
-            </div>
+      </section>
 
-            <div className="space-y-2">
-              <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                Description
-              </label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Provide resolution criteria, data sources, and any edge cases for this market."
-                rows={5}
-                className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm md:text-[15px] outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60 resize-none"
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-              <div className="space-y-2">
-                <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground inline-flex items-center gap-1">
-                  <Tag className="h-3.5 w-3.5 text-muted-foreground" />
-                  Category
-                </label>
-                <select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  className="w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60"
-                >
-                  <option value="Politics">Politics</option>
-                  <option value="Sports">Sports</option>
-                  <option value="Crypto">Crypto</option>
-                  <option value="Science">Science</option>
-                  <option value="Other">Other</option>
-                </select>
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+          <div className="w-full max-w-4xl rounded-3xl border border-border bg-background shadow-2xl">
+            <div className="flex items-center justify-between px-6 md:px-8 py-4 border-b border-border/60">
+              <div className="space-y-1">
+                <p className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                  Create market
+                </p>
+                <p className="text-[11px] text-muted-foreground">
+                  Configure a new prediction market for agents to trade.
+                </p>
               </div>
-
-              <div className="space-y-2">
-                <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground inline-flex items-center gap-1">
-                  <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-                  End time (UTC)
-                </label>
-                <input
-                  type="datetime-local"
-                  value={endTime}
-                  onChange={(e) => setEndTime(e.target.value)}
-                  className="w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                Cover image URL
-              </label>
-              <input
-                type="url"
-                value={image}
-                onChange={(e) => setImage(e.target.value)}
-                placeholder="https://images.unsplash.com/..."
-                className="w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-              <div className="space-y-2">
-                <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground inline-flex items-center gap-1">
-                  <DollarSign className="h-3.5 w-3.5 text-muted-foreground" />
-                  Initial YES price
-                </label>
-                <input
-                  type="number"
-                  min="0.01"
-                  max="0.99"
-                  step="0.01"
-                  value={initialYesPrice}
-                  onChange={(e) => setInitialYesPrice(e.target.value)}
-                  className="w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground inline-flex items-center gap-1">
-                  <Users className="h-3.5 w-3.5 text-muted-foreground" />
-                  Initial liquidity
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  step="10"
-                  value={initialLiquidity}
-                  onChange={(e) => setInitialLiquidity(e.target.value)}
-                  className="w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60"
-                  required
-                />
-              </div>
-            </div>
-
-            {submitError && (
-              <div className="rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-red-400">
-                {submitError}
-              </div>
-            )}
-
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2">
-              <p className="text-[11px] text-muted-foreground uppercase tracking-[0.2em]">
-                This will create a market record in Supabase. On-chain logic is separate.
-              </p>
               <button
-                type="submit"
-                disabled={submitting}
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-hedera-purple text-hedera-white px-6 py-2.5 text-[11px] font-bold uppercase tracking-[0.2em] shadow-[0_0_18px_rgba(130,71,229,0.45)] hover:bg-hedera-purple/90 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+                type="button"
+                onClick={() => setShowCreateModal(false)}
+                className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground"
               >
-                <Plus className="h-4 w-4" />
-                {submitting ? 'Creating...' : 'Create market'}
+                Close
               </button>
             </div>
-          </form>
+            <div className="p-6 md:p-8">
+              <section className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] gap-8 md:gap-10">
+                <form
+                  onSubmit={handleSubmit}
+                  className="space-y-6 md:space-y-8"
+                >
+                  <div className="space-y-2">
+                    <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                      Market question
+                    </label>
+                    <textarea
+                      value={question}
+                      onChange={(e) => setQuestion(e.target.value)}
+                      placeholder="Who will win the 2024 US Presidential Election?"
+                      rows={3}
+                      className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm md:text-[15px] outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60 resize-none"
+                      required
+                    />
+                  </div>
 
-          <div className="space-y-4 md:space-y-6 rounded-3xl border border-border bg-muted/40 p-6 md:p-8">
-            <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
-              Preview
-            </h2>
-            <div className="rounded-2xl border border-border bg-card p-5 md:p-6 space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-xl bg-muted flex items-center justify-center border border-border">
-                  <LayoutGrid className="h-4 w-4 text-muted-foreground" />
+                  <div className="space-y-2">
+                    <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                      Description
+                    </label>
+                    <textarea
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder="Provide resolution criteria, data sources, and any edge cases for this market."
+                      rows={5}
+                      className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm md:text-[15px] outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60 resize-none"
+                      required
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                    <div className="space-y-2">
+                      <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground inline-flex items-center gap-1">
+                        <Tag className="h-3.5 w-3.5 text-muted-foreground" />
+                        Category
+                      </label>
+                      <select
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
+                        className="w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60"
+                      >
+                        <option value="Politics">Politics</option>
+                        <option value="Sports">Sports</option>
+                        <option value="Crypto">Crypto</option>
+                        <option value="Science">Science</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground inline-flex items-center gap-1">
+                        <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                        End time (UTC)
+                      </label>
+                      <input
+                        type="datetime-local"
+                        value={endTime}
+                        onChange={(e) => setEndTime(e.target.value)}
+                        className="w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                      Cover image URL
+                    </label>
+                    <input
+                      type="url"
+                      value={image}
+                      onChange={(e) => setImage(e.target.value)}
+                      placeholder="https://images.unsplash.com/..."
+                      className="w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                    <div className="space-y-2">
+                      <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground inline-flex items-center gap-1">
+                        <DollarSign className="h-3.5 w-3.5 text-muted-foreground" />
+                        Initial YES price
+                      </label>
+                      <input
+                        type="number"
+                        min="0.01"
+                        max="0.99"
+                        step="0.01"
+                        value={initialYesPrice}
+                        onChange={(e) => setInitialYesPrice(e.target.value)}
+                        className="w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground inline-flex items-center gap-1">
+                        <Users className="h-3.5 w-3.5 text-muted-foreground" />
+                        Initial liquidity
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="10"
+                        value={initialLiquidity}
+                        onChange={(e) => setInitialLiquidity(e.target.value)}
+                        className="w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {submitError && (
+                    <div className="rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-red-400">
+                      {submitError}
+                    </div>
+                  )}
+
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2">
+                    <p className="text-[11px] text-muted-foreground uppercase tracking-[0.2em]">
+                      This will create a market record in Supabase. On-chain logic is separate.
+                    </p>
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-hedera-purple text-hedera-white px-6 py-2.5 text-[11px] font-bold uppercase tracking-[0.2em] shadow-[0_0_18px_rgba(130,71,229,0.45)] hover:bg-hedera-purple/90 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+                    >
+                      <Plus className="h-4 w-4" />
+                      {submitting ? 'Creating...' : 'Create market'}
+                    </button>
+                  </div>
+                </form>
+
+                <div className="space-y-4 md:space-y-6 rounded-3xl border border-border bg-muted/40 p-6 md:p-8">
+                  <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                    Preview
+                  </h2>
+                  <div className="rounded-2xl border border-border bg-card p-5 md:p-6 space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-9 w-9 rounded-xl bg-muted flex items-center justify-center border border-border">
+                        <LayoutGrid className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                          {category || 'Category'}
+                        </p>
+                        <p className="text-sm font-medium text-foreground line-clamp-2">
+                          {question || 'Your market question will appear here.'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                      <div className="space-y-1">
+                        <p className="font-bold">End time</p>
+                        <p className="font-mono text-[10px]">
+                          {endTime || 'TBD'}
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="font-bold">Yes price</p>
+                        <p className="font-mono text-[10px]">
+                          {initialYesPrice ? Number(initialYesPrice).toFixed(2) : '0.50'}
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="font-bold">Liquidity</p>
+                        <p className="font-mono text-[10px]">
+                          {initialLiquidity ? `$${initialLiquidity}` : '$0'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {success && (
+                    <div className="rounded-2xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-400">
+                      Draft market created. It is now available in the markets list.
+                    </div>
+                  )}
                 </div>
-                <div className="space-y-1">
-                  <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                    {category || 'Category'}
-                  </p>
-                  <p className="text-sm font-medium text-foreground line-clamp-2">
-                    {question || 'Your market question will appear here.'}
-                  </p>
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-                <div className="space-y-1">
-                  <p className="font-bold">End time</p>
-                  <p className="font-mono text-[10px]">
-                    {endTime || 'TBD'}
-                  </p>
-                </div>
-                <div className="space-y-1">
-                  <p className="font-bold">Yes price</p>
-                  <p className="font-mono text-[10px]">
-                    {initialYesPrice ? Number(initialYesPrice).toFixed(2) : '0.50'}
-                  </p>
-                </div>
-                <div className="space-y-1">
-                  <p className="font-bold">Liquidity</p>
-                  <p className="font-mono text-[10px]">
-                    {initialLiquidity ? `$${initialLiquidity}` : '$0'}
-                  </p>
-                </div>
-              </div>
+              </section>
             </div>
-
-            {success && (
-              <div className="rounded-2xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-400">
-                Draft market created. It is now available in the markets list.
-              </div>
-            )}
           </div>
-        </section>
-      </section>
+        </div>
+      )}
     </div>
   );
 }
-
