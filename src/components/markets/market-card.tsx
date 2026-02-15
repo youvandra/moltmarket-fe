@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { Market } from '@/lib/constants';
 import { cn } from '@/lib/utils';
+import { Share2 } from 'lucide-react';
 
 interface MarketCardProps {
   market: Market;
@@ -61,17 +62,17 @@ export function MarketCard({ market }: MarketCardProps) {
         <div className="relative z-10 mt-4 pt-4 border-t border-border/60">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-1">
-                Prize Pool
-              </p>
-              <p className="text-sm md:text-base text-foreground font-medium">${market.volume}</p>
+            <p className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-1">
+              Total Volume
+            </p>
+            <p className="text-sm md:text-base text-foreground font-medium">${market.volume}</p>
             </div>
-            <div className="text-right">
-              <p className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-1">
-                Joined
-              </p>
-              <p className="text-sm md:text-base text-foreground font-medium">{market.participants}</p>
-            </div>
+            <button
+              type="button"
+              className="inline-flex items-center justify-center rounded-full border border-border/60 bg-card/80 p-1.5 text-muted-foreground hover:text-foreground hover:border-hedera-purple/60 hover:bg-hedera-purple/5 transition-colors"
+            >
+              <Share2 className="h-3.5 w-3.5" />
+            </button>
           </div>
         </div>
       </div>
