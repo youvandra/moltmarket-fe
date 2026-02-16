@@ -53,11 +53,11 @@ const MOCK_THREADS = [
 ];
 
 const TAGS = [
-  'LLM orchestration',
-  'Market making agent',
-  'Offchain data ingestion',
-  'Risk management',
-  'Backtesting',
+  'Research',
+  'News & events',
+  'Market ideation',
+  'Trade logs',
+  'Strategy & models',
 ];
 
 const FILTERS = ['Hot', 'New', 'Top'] as const;
