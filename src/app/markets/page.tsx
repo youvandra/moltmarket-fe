@@ -17,6 +17,7 @@ type DbMarket = {
   initial_yes_price: number;
   initial_liquidity: number;
   status: string;
+  outcome: string | null;
 };
 
 function MarketsSkeletonGrid() {
@@ -48,6 +49,8 @@ function MarketsContent() {
   const [markets, setMarkets] = useState<Market[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [volumeFilter, setVolumeFilter] = useState<'all' | 'gt1k' | 'gt10k' | 'gt50k'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'resolved'>('all');
 
   useEffect(() => {
     let cancelled = false;
@@ -58,11 +61,28 @@ function MarketsContent() {
 
       let query = supabase
         .from('markets')
-        .select('*')
-        .eq('status', 'open');
+        .select(
+          'id, question, description, category, image_url, end_time, initial_yes_price, initial_liquidity, status, outcome',
+        );
+
+      if (statusFilter === 'active') {
+        query = query.eq('status', 'open');
+      } else if (statusFilter === 'resolved') {
+        query = query.eq('status', 'resolved');
+      } else {
+        query = query.in('status', ['open', 'resolved']);
+      }
 
       if (['Sports', 'Politics', 'Crypto', 'Science', 'Other'].includes(categoryParam)) {
         query = query.eq('category', categoryParam);
+      }
+
+      if (volumeFilter === 'gt1k') {
+        query = query.gt('initial_liquidity', 1000);
+      } else if (volumeFilter === 'gt10k') {
+        query = query.gt('initial_liquidity', 10000);
+      } else if (volumeFilter === 'gt50k') {
+        query = query.gt('initial_liquidity', 50000);
       }
 
       switch (categoryParam) {
@@ -104,6 +124,7 @@ function MarketsContent() {
           volume: row.initial_liquidity != null ? String(row.initial_liquidity) : '0',
           participants: 0,
           endTime: row.end_time,
+          outcome: row.outcome,
           outcomes: [
             {
               name: 'Yes',
@@ -128,7 +149,7 @@ function MarketsContent() {
     return () => {
       cancelled = true;
     };
-  }, [categoryParam]);
+  }, [categoryParam, volumeFilter, statusFilter]);
 
   const getCategoryIcon = (name: string) => {
     switch (name) {
@@ -163,6 +184,43 @@ function MarketsContent() {
           <p className="text-sm md:text-base text-muted-foreground max-w-2xl">
             Explore markets where autonomous agents trade onchain outcomes powered by moltmarket.
           </p>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+            Total volume
+          </span>
+          <select
+            value={volumeFilter}
+            onChange={(e) =>
+              setVolumeFilter(e.target.value as 'all' | 'gt1k' | 'gt10k' | 'gt50k')
+            }
+            className="h-8 md:h-9 rounded-2xl border border-border bg-background px-3 text-[9px] md:text-[10px] font-semibold uppercase tracking-[0.16em] text-foreground outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60"
+          >
+            <option value="all">All</option>
+            <option value="gt1k">&gt; $1K</option>
+            <option value="gt10k">&gt; $10K</option>
+            <option value="gt50k">&gt; $50K</option>
+          </select>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+            Status
+          </span>
+          <select
+            value={statusFilter}
+            onChange={(e) =>
+              setStatusFilter(e.target.value as 'all' | 'active' | 'resolved')
+            }
+            className="h-8 md:h-9 rounded-2xl border border-border bg-background px-3 text-[9px] md:text-[10px] font-semibold uppercase tracking-[0.16em] text-foreground outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60"
+          >
+            <option value="all">All</option>
+            <option value="active">Active</option>
+            <option value="resolved">Resolved</option>
+          </select>
         </div>
       </div>
 

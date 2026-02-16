@@ -9,6 +9,7 @@ export interface Market {
   participants: number;
   endTime: string;
   category: string;
+  status?: string;
   outcome?: string | null;
   outcomes: {
     name: string;

@@ -13,6 +13,7 @@ interface MarketCardProps {
 
 export function MarketCard({ market }: MarketCardProps) {
   const title = market.question;
+  const isResolved = !!(market.outcome && market.outcome.trim() !== '');
 
   return (
     <Link href={`/markets/${market.id}`} className="group block">
@@ -24,8 +25,15 @@ export function MarketCard({ market }: MarketCardProps) {
             )}
           </div>
           <div className="min-w-0">
-            <div className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-2">
-              {market.category}
+            <div className="flex items-center gap-2 mb-2">
+              <div className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                {market.category}
+              </div>
+              {isResolved && (
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-muted text-[9px] font-bold uppercase tracking-[0.16em] text-muted-foreground border border-border/60">
+                  Resolved
+                </span>
+              )}
             </div>
             <h3 className="text-base md:text-lg font-medium tracking-tight text-foreground leading-snug line-clamp-2">
               {title}
@@ -33,31 +41,42 @@ export function MarketCard({ market }: MarketCardProps) {
           </div>
         </div>
 
-        <div className="relative z-10 mt-3 grid grid-cols-2 gap-2">
-          {market.outcomes.map((outcome, index) => {
-            const percent = Math.round(outcome.probability * 100);
+        {isResolved ? (
+          <div className="relative z-10 mt-3 flex items-center justify-between rounded-xl border border-border/60 bg-muted/40 px-3 py-2.5">
+            <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+              Outcome
+            </span>
+            <span className="text-xs md:text-sm font-semibold text-foreground truncate max-w-[60%] text-right">
+              {market.outcome}
+            </span>
+          </div>
+        ) : (
+          <div className="relative z-10 mt-3 grid grid-cols-2 gap-2">
+            {market.outcomes.map((outcome, index) => {
+              const percent = Math.round(outcome.probability * 100);
 
-            return (
-              <div
-                key={outcome.name}
-                className={cn(
-                  'group relative flex items-center justify-center rounded-xl py-2.5 text-[11px] md:text-xs font-semibold transition-colors',
-                  'border border-border/60',
-                  index === 0
-                    ? 'bg-hedera-purple/15 border-hedera-purple/60 text-foreground'
-                    : 'bg-muted text-muted-foreground'
-                )}
-              >
-                <span className="truncate transition-opacity duration-150 group-hover:opacity-0">
-                  {outcome.name}
-                </span>
-                <span className="absolute transition-opacity duration-150 opacity-0 group-hover:opacity-100">
-                  {percent}%
-                </span>
-              </div>
-            );
-          })}
-        </div>
+              return (
+                <div
+                  key={outcome.name}
+                  className={cn(
+                    'group relative flex items-center justify-center rounded-xl py-2.5 text-[11px] md:text-xs font-semibold transition-colors',
+                    'border border-border/60',
+                    index === 0
+                      ? 'bg-hedera-purple/15 border-hedera-purple/60 text-foreground'
+                      : 'bg-muted text-muted-foreground'
+                  )}
+                >
+                  <span className="truncate transition-opacity duration-150 group-hover:opacity-0">
+                    {outcome.name}
+                  </span>
+                  <span className="absolute transition-opacity duration-150 opacity-0 group-hover:opacity-100">
+                    {percent}%
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         <div className="relative z-10 mt-4 pt-4 border-t border-border/60">
           <div className="flex items-center justify-between gap-4">
