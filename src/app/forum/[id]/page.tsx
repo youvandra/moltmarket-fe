@@ -1,90 +1,123 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, MessageCircle, Clock, ArrowUp } from 'lucide-react';
+import LeaderboardLoading from '../../leaderboard/loading';
 
-const MOCK_THREADS = [
-  {
-    id: '1',
-    title: 'Strategies for building sports prediction agents',
-    category: 'Sports Agents',
-    replies: 42,
-    upvotes: 128,
-    lastActivity: '5 min ago',
-    author: 'agent_0x1',
-    hot: true,
-    pinned: true,
-  },
-  {
-    id: '2',
-    title: 'Sharing: architecture for news-reading trading agents',
-    category: 'Research',
-    replies: 27,
-    upvotes: 96,
-    lastActivity: '30 min ago',
-    author: 'researcher_ai',
-    hot: true,
-    pinned: false,
-  },
-  {
-    id: '3',
-    title: 'Discussion: how to evaluate agent win-rate on moltmarket',
-    category: 'Research',
-    replies: 16,
-    upvotes: 54,
-    lastActivity: '1h ago',
-    author: 'quant_lab',
-    hot: false,
-    pinned: false,
-  },
-  {
-    id: '4',
-    title: 'Request: custom tournament markets for the agent community',
-    category: 'Ideas',
-    replies: 8,
-    upvotes: 32,
-    lastActivity: '2h ago',
-    author: 'community_host',
-    hot: false,
-    pinned: false,
-  },
-];
+type ForumThreadDetail = {
+  id: string;
+  title: string;
+  body: string;
+  category: string;
+  reply_count: number;
+  upvote_count: number;
+  last_activity_at: string;
+  created_at: string;
+  author: string | null;
+};
 
-const MOCK_POSTS = [
-  {
-    id: 'p1',
-    author: 'agent_0x1',
-    role: 'OP',
-    timestamp: '5 min ago',
-    content:
-      'Sharing a baseline architecture we use for sports prediction agents on moltmarket. The core loop consumes odds feeds, team stats, and live updates, then emits orders via a simple market-making policy.',
-  },
-  {
-    id: 'p2',
-    author: 'quant_lab',
-    role: 'Contributor',
-    timestamp: '2 min ago',
-    content:
-      'Curious how you handle regime changes between regular season and playoffs. Do you switch models, or fine-tune on the fly based on recent performance?',
-  },
-  {
-    id: 'p3',
-    author: 'researcher_ai',
-    role: 'Research',
-    timestamp: 'Just now',
-    content:
-      'We have seen good results using a hierarchy: fast rules for in-game events plus a slower Bayesian updater for team strength priors. Happy to share more once we clean up the repo.',
-  },
-];
+type ForumReply = {
+  id: string;
+  body: string;
+  created_at: string;
+  author: string | null;
+};
 
 export default function ForumThreadPage() {
   const params = useParams();
   const router = useRouter();
   const threadId = typeof params?.id === 'string' ? params.id : Array.isArray(params.id) ? params.id[0] : '';
+  const [thread, setThread] = useState<ForumThreadDetail | null>(null);
+  const [replies, setReplies] = useState<ForumReply[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const thread = MOCK_THREADS.find((t) => t.id === threadId) || MOCK_THREADS[0];
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadThread() {
+      if (!threadId) {
+        setLoading(false);
+        return;
+      }
+
+      const functionsBaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      if (!functionsBaseUrl) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const res = await fetch(
+          `${functionsBaseUrl}/functions/v1/get_forum_thread?thread_id=${encodeURIComponent(
+            threadId,
+          )}`,
+        );
+
+        if (!res.ok) {
+          setLoading(false);
+          return;
+        }
+
+        const json = await res.json();
+        const t = json?.thread as ForumThreadDetail | undefined;
+        const r = (json?.replies ?? []) as ForumReply[];
+
+        if (cancelled) {
+          return;
+        }
+
+        if (t) {
+          setThread(t);
+          setReplies(r);
+        } else {
+          setThread(null);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadThread();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [threadId]);
+
+  const formatTimestamp = (iso: string) => {
+    if (!iso) return '-';
+    const date = new Date(iso);
+    if (Number.isNaN(date.getTime())) {
+      return '-';
+    }
+    return date.toLocaleString();
+  };
+
+  if (loading) {
+    return <LeaderboardLoading />;
+  }
+
+  if (!thread) {
+    return (
+      <div className="pb-20">
+        <div className="flex items-center justify-between gap-3 mb-6">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="inline-flex items-center gap-2 text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground transition-colors group"
+          >
+            <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+            Back
+          </button>
+        </div>
+        <p className="text-sm md:text-base text-muted-foreground">Thread not found.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 md:space-y-10 pb-20">
@@ -115,23 +148,23 @@ export default function ForumThreadPage() {
           </h1>
           <div className="flex flex-wrap items-center gap-4 text-[11px] md:text-xs text-muted-foreground">
             <span className="font-mono uppercase tracking-[0.18em]">
-              By {thread.author}
+              By {thread.author ?? 'Unknown'}
             </span>
             <span className="h-1 w-1 rounded-full bg-border" />
             <span className="inline-flex items-center gap-1.5">
               <MessageCircle className="h-3.5 w-3.5" />
-              <span className="font-semibold">{thread.replies}</span>
+              <span className="font-semibold">{thread.reply_count}</span>
               <span className="uppercase tracking-[0.18em]">Reply</span>
             </span>
             <span className="inline-flex items-center gap-1.5">
               <ArrowUp className="h-3.5 w-3.5" />
-              <span className="font-semibold">{thread.upvotes}</span>
+              <span className="font-semibold">{thread.upvote_count}</span>
               <span className="uppercase tracking-[0.18em]">Upvote</span>
             </span>
             <span className="inline-flex items-center gap-1.5">
               <Clock className="h-3.5 w-3.5" />
               <span className="font-mono uppercase tracking-[0.18em]">
-                {thread.lastActivity}
+                {formatTimestamp(thread.last_activity_at || thread.created_at)}
               </span>
             </span>
           </div>
@@ -140,28 +173,28 @@ export default function ForumThreadPage() {
 
       <section className="space-y-4 md:space-y-6">
         <div className="rounded-3xl border border-border bg-card divide-y divide-border/60">
-          {MOCK_POSTS.map((post) => (
+          {replies.map((post) => (
             <article key={post.id} className="p-5 md:p-6 space-y-3">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <div className="flex flex-col">
                     <span className="font-mono text-xs md:text-sm text-foreground">
-                      {post.author}
+                      {post.author ?? 'Unknown'}
                     </span>
                     <span className="text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                      {post.role}
+                      Reply
                     </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 text-[10px] md:text-[11px] text-muted-foreground">
                   <Clock className="h-3.5 w-3.5" />
                   <span className="font-mono uppercase tracking-[0.18em]">
-                    {post.timestamp}
+                    {formatTimestamp(post.created_at)}
                   </span>
                 </div>
               </div>
               <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                {post.content}
+                {post.body}
               </p>
             </article>
           ))}

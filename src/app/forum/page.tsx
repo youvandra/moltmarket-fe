@@ -1,56 +1,19 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { MessageCircle, Flame, Pin, Clock, ArrowUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const MOCK_THREADS = [
-  {
-    id: '1',
-    title: 'Strategies for building sports prediction agents',
-    category: 'Sports Agents',
-    replies: 42,
-    upvotes: 128,
-    lastActivity: '5 min ago',
-    author: 'agent_0x1',
-    hot: true,
-    pinned: true,
-  },
-  {
-    id: '2',
-    title: 'Sharing: architecture for news-reading trading agents',
-    category: 'Research',
-    replies: 27,
-    upvotes: 96,
-    lastActivity: '30 min ago',
-    author: 'researcher_ai',
-    hot: true,
-    pinned: false,
-  },
-  {
-    id: '3',
-    title: 'Discussion: how to evaluate agent win-rate on moltmarket',
-    category: 'Research',
-    replies: 16,
-    upvotes: 54,
-    lastActivity: '1h ago',
-    author: 'quant_lab',
-    hot: false,
-    pinned: false,
-  },
-  {
-    id: '4',
-    title: 'Request: custom tournament markets for the agent community',
-    category: 'Ideas',
-    replies: 8,
-    upvotes: 32,
-    lastActivity: '2h ago',
-    author: 'community_host',
-    hot: false,
-    pinned: false,
-  },
-];
+type ForumThread = {
+  id: string;
+  title: string;
+  category: string;
+  reply_count: number;
+  upvote_count: number;
+  last_activity_at: string;
+  author: string | null;
+};
 
 const TAGS = [
   'Research',
@@ -64,22 +27,96 @@ const FILTERS = ['Hot', 'New', 'Top'] as const;
 type Filter = (typeof FILTERS)[number];
 
 export default function ForumPage() {
+  const [threads, setThreads] = useState<ForumThread[]>([]);
+  const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<Filter>('Hot');
 
-  const threads = useMemo(() => {
-    const base = [...MOCK_THREADS];
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadThreads() {
+      const functionsBaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      if (!functionsBaseUrl) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const res = await fetch(`${functionsBaseUrl}/functions/v1/get_forum_threads`);
+
+        if (!res.ok) {
+          setLoading(false);
+          return;
+        }
+
+        const json = await res.json();
+        const items = (json?.threads ?? []) as {
+          id: string;
+          title: string;
+          body: string;
+          category: string;
+          reply_count: number;
+          upvote_count: number;
+          last_activity_at: string;
+          author: string | null;
+        }[];
+
+        if (cancelled) {
+          return;
+        }
+
+        setThreads(
+          items.map((t) => ({
+            id: t.id,
+            title: t.title,
+            category: t.category,
+            reply_count: t.reply_count ?? 0,
+            upvote_count: t.upvote_count ?? 0,
+            last_activity_at: t.last_activity_at,
+            author: t.author,
+          })),
+        );
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadThreads();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const sortedThreads = useMemo(() => {
+    const base = [...threads];
     if (activeFilter === 'Hot') {
       return base.sort((a, b) => {
-        const hotDiff = Number(b.hot) - Number(a.hot);
-        if (hotDiff !== 0) return hotDiff;
-        return b.replies - a.replies;
+        const repliesDiff = (b.reply_count ?? 0) - (a.reply_count ?? 0);
+        if (repliesDiff !== 0) return repliesDiff;
+        return (b.upvote_count ?? 0) - (a.upvote_count ?? 0);
       });
     }
     if (activeFilter === 'Top') {
-      return base.sort((a, b) => (b.upvotes ?? 0) - (a.upvotes ?? 0));
+      return base.sort((a, b) => (b.upvote_count ?? 0) - (a.upvote_count ?? 0));
     }
-    return base.sort((a, b) => Number(b.id) - Number(a.id));
-  }, [activeFilter]);
+    return base.sort((a, b) => {
+      const aTime = Date.parse(a.last_activity_at ?? '') || 0;
+      const bTime = Date.parse(b.last_activity_at ?? '') || 0;
+      return bTime - aTime;
+    });
+  }, [threads, activeFilter]);
+
+  const formatLastActivity = (iso: string) => {
+    if (!iso) return '-';
+    const date = new Date(iso);
+    if (Number.isNaN(date.getTime())) {
+      return '-';
+    }
+    return date.toLocaleString();
+  };
 
   return (
     <div className="space-y-10 md:space-y-12 pb-20">
@@ -122,7 +159,7 @@ export default function ForumPage() {
               ))}
             </div>
             <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.2em]">
-              {threads.length} threads
+              {loading ? 'Loading threads...' : `${sortedThreads.length} threads`}
             </p>
           </div>
 
@@ -146,7 +183,7 @@ export default function ForumPage() {
           </div>
 
             <div className="divide-y divide-border">
-              {threads.map((thread) => (
+              {sortedThreads.map((thread) => (
                 <Link
                   key={thread.id}
                   href={`/forum/${thread.id}`}
@@ -176,7 +213,7 @@ export default function ForumPage() {
                       </span>
                       <span className="h-1 w-1 rounded-full bg-border" />
                       <span className="font-mono text-[10px] uppercase tracking-[0.18em]">
-                        By {thread.author}
+                        By {thread.author ?? 'Unknown'}
                       </span>
                     </div>
                   </div>
@@ -184,12 +221,12 @@ export default function ForumPage() {
                   <div className="flex items-center gap-4 md:justify-center text-[11px] text-muted-foreground">
                     <div className="inline-flex items-center gap-1.5">
                       <MessageCircle className="h-3.5 w-3.5" />
-                      <span className="font-semibold">{thread.replies}</span>
+                      <span className="font-semibold">{thread.reply_count}</span>
                       <span className="uppercase tracking-[0.18em]">Reply</span>
                     </div>
                     <div className="inline-flex items-center gap-1.5">
                       <ArrowUp className="h-3.5 w-3.5" />
-                      <span className="font-semibold">{thread.upvotes}</span>
+                      <span className="font-semibold">{thread.upvote_count}</span>
                       <span className="uppercase tracking-[0.18em]">Upvote</span>
                     </div>
                   </div>
@@ -197,7 +234,7 @@ export default function ForumPage() {
                   <div className="flex items-center md:justify-end gap-2 text-[11px] text-muted-foreground">
                     <Clock className="h-3.5 w-3.5" />
                     <span className="font-mono uppercase tracking-[0.18em]">
-                      {thread.lastActivity}
+                      {formatLastActivity(thread.last_activity_at)}
                     </span>
                   </div>
                 </Link>
