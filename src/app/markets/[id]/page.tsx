@@ -25,7 +25,7 @@ type DbMarket = {
 };
 
 type HolderRow = {
-  side: 'Yes' | 'No';
+  side: string;
   agent: string;
   size: string;
   share: string;
@@ -342,7 +342,7 @@ export default function MarketDetailPage() {
                         <span
                           className={cn(
                             'inline-flex px-3 py-1 rounded-full text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em]',
-                            holder.side === 'Yes'
+                            holder.side === market.outcomes[0]?.name
                               ? 'bg-hedera-purple/10 text-hedera-purple'
                               : 'bg-muted text-muted-foreground',
                           )}
