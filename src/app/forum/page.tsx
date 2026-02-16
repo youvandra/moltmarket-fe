@@ -28,6 +28,35 @@ const TAGS = [
 const FILTERS = ['Hot', 'New', 'Top'] as const;
 type Filter = (typeof FILTERS)[number];
 
+function ForumRowSkeleton() {
+  return (
+    <div className="px-6 py-4 md:py-5 flex flex-col md:grid md:grid-cols-[minmax(0,1.8fr)_minmax(0,0.6fr)_minmax(0,0.6fr)] gap-3 md:gap-4">
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <div className="h-4 w-16 rounded-full bg-muted animate-pulse" />
+          <div className="h-4 w-12 rounded-full bg-muted/80 animate-pulse" />
+        </div>
+        <div className="h-4 w-3/4 rounded bg-muted animate-pulse" />
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="h-5 w-24 rounded-full bg-muted animate-pulse" />
+          <span className="h-1 w-1 rounded-full bg-border" />
+          <div className="h-3 w-24 rounded bg-muted/80 animate-pulse" />
+        </div>
+      </div>
+
+      <div className="flex items-center gap-4 md:justify-center text-[11px] text-muted-foreground">
+        <div className="h-4 w-16 rounded bg-muted animate-pulse" />
+        <div className="h-4 w-16 rounded bg-muted animate-pulse" />
+      </div>
+
+      <div className="flex items-center md:justify-end gap-2 text-[11px] text-muted-foreground">
+        <div className="h-3.5 w-3.5 rounded-full bg-muted animate-pulse" />
+        <div className="h-3 w-28 rounded bg-muted animate-pulse" />
+      </div>
+    </div>
+  );
+}
+
 export default function ForumPage() {
   const [threads, setThreads] = useState<ForumThread[]>([]);
   const [loading, setLoading] = useState(true);
@@ -185,62 +214,66 @@ export default function ForumPage() {
           </div>
 
             <div className="divide-y divide-border">
-              {sortedThreads.map((thread) => (
-                <Link
-                  key={thread.id}
-                  href={`/forum/${thread.id}`}
-                  className="px-6 py-4 md:py-5 flex flex-col md:grid md:grid-cols-[minmax(0,1.8fr)_minmax(0,0.6fr)_minmax(0,0.6fr)] gap-3 md:gap-4 hover:bg-muted/40 transition-colors"
-                >
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      {thread.pinned && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/40 text-[10px] font-bold uppercase tracking-[0.2em] text-amber-400">
-                          <Pin className="h-3 w-3" />
-                          Pinned
-                        </span>
-                      )}
-                      {thread.hot && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/10 border border-red-500/40 text-[10px] font-bold uppercase tracking-[0.2em] text-red-400">
-                          <Flame className="h-3 w-3" />
-                          Hot
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-sm md:text-base font-medium text-foreground line-clamp-2">
-                      {thread.title}
-                    </p>
-                    <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-muted text-[10px] font-bold uppercase tracking-[0.18em]">
-                        {thread.category}
-                      </span>
-                      <span className="h-1 w-1 rounded-full bg-border" />
-                      <span className="font-mono text-[10px] uppercase tracking-[0.18em]">
-                        By {thread.author ?? 'Unknown'}
-                      </span>
-                    </div>
-                  </div>
+              {loading
+                ? Array.from({ length: 4 }).map((_, idx) => (
+                    <ForumRowSkeleton key={idx} />
+                  ))
+                : sortedThreads.map((thread) => (
+                    <Link
+                      key={thread.id}
+                      href={`/forum/${thread.id}`}
+                      className="px-6 py-4 md:py-5 flex flex-col md:grid md:grid-cols-[minmax(0,1.8fr)_minmax(0,0.6fr)_minmax(0,0.6fr)] gap-3 md:gap-4 hover:bg-muted/40 transition-colors"
+                    >
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          {thread.pinned && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/40 text-[10px] font-bold uppercase tracking-[0.2em] text-amber-400">
+                              <Pin className="h-3 w-3" />
+                              Pinned
+                            </span>
+                          )}
+                          {thread.hot && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/10 border border-red-500/40 text-[10px] font-bold uppercase tracking-[0.2em] text-red-400">
+                              <Flame className="h-3 w-3" />
+                              Hot
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm md:text-base font-medium text-foreground line-clamp-2">
+                          {thread.title}
+                        </p>
+                        <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-muted text-[10px] font-bold uppercase tracking-[0.18em]">
+                            {thread.category}
+                          </span>
+                          <span className="h-1 w-1 rounded-full bg-border" />
+                          <span className="font-mono text-[10px] uppercase tracking-[0.18em]">
+                            By {thread.author ?? 'Unknown'}
+                          </span>
+                        </div>
+                      </div>
 
-                  <div className="flex items-center gap-4 md:justify-center text-[11px] text-muted-foreground">
-                    <div className="inline-flex items-center gap-1.5">
-                      <MessageCircle className="h-3.5 w-3.5" />
-                      <span className="font-semibold">{thread.reply_count}</span>
-                      <span className="uppercase tracking-[0.18em]">Reply</span>
-                    </div>
-                    <div className="inline-flex items-center gap-1.5">
-                      <ArrowUp className="h-3.5 w-3.5" />
-                      <span className="font-semibold">{thread.upvote_count}</span>
-                      <span className="uppercase tracking-[0.18em]">Upvote</span>
-                    </div>
-                  </div>
+                      <div className="flex items-center gap-4 md:justify-center text-[11px] text-muted-foreground">
+                        <div className="inline-flex items-center gap-1.5">
+                          <MessageCircle className="h-3.5 w-3.5" />
+                          <span className="font-semibold">{thread.reply_count}</span>
+                          <span className="uppercase tracking-[0.18em]">Reply</span>
+                        </div>
+                        <div className="inline-flex items-center gap-1.5">
+                          <ArrowUp className="h-3.5 w-3.5" />
+                          <span className="font-semibold">{thread.upvote_count}</span>
+                          <span className="uppercase tracking-[0.18em]">Upvote</span>
+                        </div>
+                      </div>
 
-                  <div className="flex items-center md:justify-end gap-2 text-[11px] text-muted-foreground">
-                    <Clock className="h-3.5 w-3.5" />
-                    <span className="font-mono uppercase tracking-[0.18em]">
-                      {formatLastActivity(thread.last_activity_at)}
-                    </span>
-                  </div>
-                </Link>
-              ))}
+                      <div className="flex items-center md:justify-end gap-2 text-[11px] text-muted-foreground">
+                        <Clock className="h-3.5 w-3.5" />
+                        <span className="font-mono uppercase tracking-[0.18em]">
+                          {formatLastActivity(thread.last_activity_at)}
+                        </span>
+                      </div>
+                    </Link>
+                  ))}
             </div>
           </div>
       </section>

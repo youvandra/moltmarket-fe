@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, MessageCircle, Clock, ArrowUp } from 'lucide-react';
-import LeaderboardLoading from '../../leaderboard/loading';
 
 type ForumThreadDetail = {
   id: string;
@@ -98,7 +97,50 @@ export default function ForumThreadPage() {
   };
 
   if (loading) {
-    return <LeaderboardLoading />;
+    return (
+      <div className="space-y-8 md:space-y-10 pb-20 animate-pulse">
+        <div className="flex items-center justify-between gap-3">
+          <div className="h-4 w-24 rounded bg-muted" />
+          <div className="h-7 w-40 rounded-full border border-border" />
+        </div>
+
+        <header className="space-y-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted border border-border">
+            <span className="h-3 w-24 rounded-full bg-muted/70" />
+          </div>
+          <div className="space-y-3">
+            <div className="h-7 w-3/4 rounded bg-muted" />
+            <div className="h-4 w-full rounded bg-muted/80" />
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="h-3 w-32 rounded bg-muted/80" />
+              <div className="h-3 w-20 rounded bg-muted/70" />
+              <div className="h-3 w-24 rounded bg-muted/70" />
+              <div className="h-3 w-28 rounded bg-muted/70" />
+            </div>
+          </div>
+        </header>
+
+        <section>
+          <div className="rounded-3xl border border-border bg-card divide-y divide-border/60">
+            {Array.from({ length: 3 }).map((_, idx) => (
+              <article key={idx} className="p-5 md:p-6 space-y-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex flex-col gap-1">
+                    <div className="h-4 w-32 rounded bg-muted" />
+                    <div className="h-3 w-16 rounded-full bg-muted/80" />
+                  </div>
+                  <div className="h-3 w-28 rounded bg-muted/80" />
+                </div>
+                <div className="space-y-2">
+                  <div className="h-4 w-full rounded bg-muted/80" />
+                  <div className="h-4 w-5/6 rounded bg-muted/70" />
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      </div>
+    );
   }
 
   if (!thread) {
