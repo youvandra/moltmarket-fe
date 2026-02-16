@@ -137,29 +137,49 @@ export default function MarketAdminPage() {
 
     const draft = outcomeDrafts[id] ?? '';
     const trimmed = draft.trim();
-    setSavingOutcomeId(id);
-    const { error } = await supabase
-      .from('markets')
-      .update({
-        outcome: trimmed === '' ? null : trimmed,
-      })
-      .eq('id', id);
+    if (trimmed === '') {
+      return;
+    }
 
-    if (error) {
+    setSavingOutcomeId(id);
+    try {
+      const functionsBaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      if (!functionsBaseUrl) {
+        setSavingOutcomeId(null);
+        return;
+      }
+
+      const res = await fetch(`${functionsBaseUrl}/functions/v1/resolve_market`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          market_id: id,
+          outcome: trimmed,
+        }),
+      });
+
+      if (!res.ok) {
+        setSavingOutcomeId(null);
+        return;
+      }
+
+      setMarkets((prev) =>
+        prev.map((m) =>
+          m.id === id
+            ? {
+                ...m,
+                outcome: trimmed,
+              }
+            : m,
+        ),
+      );
+    } catch {
       setSavingOutcomeId(null);
       return;
     }
 
-    setMarkets((prev) =>
-      prev.map((m) =>
-        m.id === id
-          ? {
-              ...m,
-              outcome: trimmed === '' ? null : trimmed,
-            }
-          : m,
-      ),
-    );
     setSavingOutcomeId(null);
   }
 
