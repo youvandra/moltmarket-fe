@@ -129,12 +129,19 @@ export default function MarketAdminPage() {
 
   async function handleSaveOutcome(id: string) {
     if (!user) return;
+    const current = markets.find((m) => m.id === id);
+    if (!current) return;
+    if (current.outcome && current.outcome.trim() !== '') {
+      return;
+    }
+
     const draft = outcomeDrafts[id] ?? '';
+    const trimmed = draft.trim();
     setSavingOutcomeId(id);
     const { error } = await supabase
       .from('markets')
       .update({
-        outcome: draft.trim() === '' ? null : draft.trim(),
+        outcome: trimmed === '' ? null : trimmed,
       })
       .eq('id', id);
 
@@ -148,7 +155,7 @@ export default function MarketAdminPage() {
         m.id === id
           ? {
               ...m,
-              outcome: draft.trim() === '' ? null : draft.trim(),
+              outcome: trimmed === '' ? null : trimmed,
             }
           : m,
       ),
@@ -312,53 +319,62 @@ export default function MarketAdminPage() {
                   </tr>
                 )}
                 {!marketsLoading &&
-                  markets.map((m) => (
-                    <tr key={m.id} className="border-t border-border/40 align-top">
-                      <td className="py-3 pr-4">
-                        <div className="text-[11px] md:text-[12px] text-foreground line-clamp-2">
-                          {m.question}
-                        </div>
-                      </td>
-                      <td className="py-3 px-4 text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                        {m.category}
-                      </td>
-                      <td className="py-3 px-4 text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                        {m.status}
-                      </td>
-                      <td className="py-3 px-4 text-[10px] text-muted-foreground">
-                        {m.end_time}
-                      </td>
-                      <td className="py-3 px-4 text-right text-[10px] font-medium text-foreground">
-                        ${m.initial_liquidity != null ? m.initial_liquidity.toLocaleString() : '0'}
-                      </td>
-                      <td className="py-3 pl-4">
-                        <div className="flex items-center gap-2">
-                          <select
-                            value={outcomeDrafts[m.id] ?? (m.outcome ?? '')}
-                            onChange={(e) =>
-                              setOutcomeDrafts((prev) => ({
-                                ...prev,
-                                [m.id]: e.target.value,
-                              }))
-                            }
-                            className="w-32 md:w-40 rounded-2xl border border-border bg-background px-3 py-1.5 text-[10px] outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60"
-                          >
-                            <option value="">-</option>
-                            {m.option_a && <option value={m.option_a}>{m.option_a}</option>}
-                            {m.option_b && <option value={m.option_b}>{m.option_b}</option>}
-                          </select>
-                          <button
-                            type="button"
-                            onClick={() => handleSaveOutcome(m.id)}
-                            disabled={savingOutcomeId === m.id}
-                            className="inline-flex items-center justify-center rounded-full bg-hedera-purple text-hedera-white px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.2em] disabled:opacity-60 disabled:cursor-not-allowed"
-                          >
-                            {savingOutcomeId === m.id ? 'Saving' : 'Save'}
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                  markets.map((m) => {
+                    const isResolved = !!(m.outcome && m.outcome.trim() !== '');
+
+                    return (
+                      <tr key={m.id} className="border-t border-border/40 align-top">
+                        <td className="py-3 pr-4">
+                          <div className="text-[11px] md:text-[12px] text-foreground line-clamp-2">
+                            {m.question}
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                          {m.category}
+                        </td>
+                        <td className="py-3 px-4 text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                          {m.status}
+                        </td>
+                        <td className="py-3 px-4 text-[10px] text-muted-foreground">
+                          {m.end_time}
+                        </td>
+                        <td className="py-3 px-4 text-right text-[10px] font-medium text-foreground">
+                          ${m.initial_liquidity != null ? m.initial_liquidity.toLocaleString() : '0'}
+                        </td>
+                        <td className="py-3 pl-4">
+                          <div className="flex items-center gap-2">
+                            <select
+                              value={outcomeDrafts[m.id] ?? (m.outcome ?? '')}
+                              onChange={(e) =>
+                                setOutcomeDrafts((prev) => ({
+                                  ...prev,
+                                  [m.id]: e.target.value,
+                                }))
+                              }
+                              disabled={isResolved || savingOutcomeId === m.id}
+                              className="w-32 md:w-40 rounded-2xl border border-border bg-background px-3 py-1.5 text-[10px] outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60 disabled:opacity-60 disabled:cursor-not-allowed"
+                            >
+                              <option value="">-</option>
+                              {m.option_a && <option value={m.option_a}>{m.option_a}</option>}
+                              {m.option_b && <option value={m.option_b}>{m.option_b}</option>}
+                            </select>
+                            <button
+                              type="button"
+                              onClick={() => handleSaveOutcome(m.id)}
+                              disabled={isResolved || savingOutcomeId === m.id}
+                              className={`inline-flex items-center justify-center rounded-full px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.2em] disabled:opacity-60 disabled:cursor-not-allowed ${
+                                isResolved
+                                  ? 'bg-muted text-muted-foreground'
+                                  : 'bg-hedera-purple text-hedera-white'
+                              }`}
+                            >
+                              {isResolved ? 'Solved' : savingOutcomeId === m.id ? 'Saving' : 'Save'}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
               </tbody>
             </table>
           </div>
