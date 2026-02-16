@@ -122,10 +122,10 @@ export default function LeaderboardPage() {
 
       {/* Top 3 Podium */}
       <div className="flex flex-col md:grid md:grid-cols-3 gap-6 items-end md:items-stretch">
-        {/* Mobile Podium (Flex layout) / Desktop Podium (Grid layout) */}
-        <div className="flex w-full items-end justify-center gap-2 md:contents">
+        {/* Mobile: stacked cards, Desktop: podium grid */}
+        <div className="flex flex-col w-full gap-3 md:contents">
           {/* Rank 2 */}
-          <div className="order-1 md:order-none flex-1 md:flex-none">
+          <div className="order-2 md:order-none flex-1 md:flex-none">
             <div className="relative overflow-hidden rounded-2xl md:rounded-3xl border border-border bg-card p-4 md:p-8 transition-all hover:scale-[1.02] h-full flex flex-col items-center text-center space-y-3 md:space-y-4">
               <div className="h-10 w-10 md:h-16 md:w-16 rounded-lg md:rounded-2xl bg-muted flex items-center justify-center mb-1 md:mb-2">
                 <Medal className="h-5 w-5 md:h-8 md:w-8 text-slate-400" />
@@ -156,11 +156,25 @@ export default function LeaderboardPage() {
                   </p>
                 </div>
               </div>
+              {topThree[1] && (
+                <div className="flex items-center justify-between w-full pt-2 md:pt-3 text-[9px] md:text-[10px] font-medium text-muted-foreground">
+                  <span className="uppercase tracking-[0.18em]">
+                    {topThree[1].total_trades} trades
+                  </span>
+                  <span className="uppercase tracking-[0.18em]">
+                    {topThree[1].total_trades > 0
+                      ? `${Math.round(
+                          (topThree[1].total_wins / topThree[1].total_trades) * 100,
+                        )}% win rate`
+                      : '0% win rate'}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Rank 1 */}
-          <div className="order-2 md:order-none flex-[1.2] md:flex-none z-10">
+          <div className="order-1 md:order-none flex-[1.2] md:flex-none z-10">
             <div className="relative overflow-hidden rounded-2xl md:rounded-3xl border border-foreground bg-foreground text-background p-5 md:p-8 transition-all hover:scale-[1.02] shadow-2xl md:scale-105 h-full flex flex-col items-center text-center space-y-3 md:space-y-4">
               <div className="absolute top-0 right-0 p-2 md:p-4">
                 <Trophy className="h-4 w-4 md:h-6 md:w-6 text-hedera-purple animate-pulse" />
@@ -194,6 +208,20 @@ export default function LeaderboardPage() {
                   </p>
                 </div>
               </div>
+              {topThree[0] && (
+                <div className="flex items-center justify-between w-full pt-2 md:pt-3 text-[9px] md:text-[10px] font-medium text-background/70">
+                  <span className="uppercase tracking-[0.18em]">
+                    {topThree[0].total_trades} trades
+                  </span>
+                  <span className="uppercase tracking-[0.18em]">
+                    {topThree[0].total_trades > 0
+                      ? `${Math.round(
+                          (topThree[0].total_wins / topThree[0].total_trades) * 100,
+                        )}% win rate`
+                      : '0% win rate'}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -229,6 +257,20 @@ export default function LeaderboardPage() {
                   </p>
                 </div>
               </div>
+              {topThree[2] && (
+                <div className="flex items-center justify-between w-full pt-2 md:pt-3 text-[9px] md:text-[10px] font-medium text-muted-foreground">
+                  <span className="uppercase tracking-[0.18em]">
+                    {topThree[2].total_trades} trades
+                  </span>
+                  <span className="uppercase tracking-[0.18em]">
+                    {topThree[2].total_trades > 0
+                      ? `${Math.round(
+                          (topThree[2].total_wins / topThree[2].total_trades) * 100,
+                        )}% win rate`
+                      : '0% win rate'}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>
