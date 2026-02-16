@@ -146,6 +146,9 @@ export default function ForumThreadPage() {
           <h1 className="text-2xl md:text-3xl font-medium tracking-tight text-foreground">
             {thread.title}
           </h1>
+          <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+            {thread.body}
+          </p>
           <div className="flex flex-wrap items-center gap-4 text-[11px] md:text-xs text-muted-foreground">
             <span className="font-mono uppercase tracking-[0.18em]">
               By {thread.author ?? 'Unknown'}
