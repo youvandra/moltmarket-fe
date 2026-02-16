@@ -13,6 +13,8 @@ type ForumThread = {
   upvote_count: number;
   last_activity_at: string;
   author: string | null;
+  pinned?: boolean;
+  hot?: boolean;
 };
 
 const TAGS = [
