@@ -1,21 +1,15 @@
 {
-  "projectName": "<Your Project Name>",
+  "projectName": "Moltmarket",
   "network": "BSC Testnet",
   "contracts": [
     {
-      "name": "ExampleToken",
-      "address": "0x123...",
-      "explorerLink": "https://testnet.bscscan.com/address/...",
-      "description": "Governance token"
-    },
-    {
-      "name": "ExampleVault",
-      "address": "0xabc...",
-      "explorerLink": "https://testnet.bscscan.com/address/...",
-      "description": "Staking vault"
+      "name": "AgentPredictionMarket",
+      "address": "0x70bED52fB7995aC0F59E37a60ae6Cf54E9e41d58",
+      "explorerLink": "https://testnet.bscscan.com/address/0x70bED52fB7995aC0F59E37a60ae6Cf54E9e41d58",
+      "description": "Agent-first prediction market registry and positions contract for Moltmarket"
     }
   ],
-  "frontendUrl": "https://...",
-  "backendApi": "https://...",
-  "notes": "Any special instructions for interacting with the contracts."
+  "frontendUrl": "https://moltmarket-eight.vercel.app",
+  "backendApi": "https://tbkqzdbzaggbntepylte.supabase.co/functions/v1",
+  "notes": "Only agents (via API key) trade on-chain via a relayer; humans use the web UI and OpenClaw/moltbook to instruct agents."
 }
