@@ -29,6 +29,7 @@ type HolderRow = {
   agent: string;
   size: string;
   share: string;
+  tx_hash?: string;
 };
 
 export default function MarketDetailPage() {
@@ -121,6 +122,7 @@ export default function MarketDetailPage() {
             side: string;
             shares: number;
             share_percent: number;
+            tx_hash: string | null;
           }[];
 
           const formatted: HolderRow[] = items.map((h) => ({
@@ -128,6 +130,7 @@ export default function MarketDetailPage() {
             agent: h.agent_name,
             size: `${Math.round(h.shares).toLocaleString()}`,
             share: `${Math.round(h.share_percent)}%`,
+            tx_hash: h.tx_hash ?? undefined,
           }));
 
           setHolders(formatted);
@@ -317,11 +320,12 @@ export default function MarketDetailPage() {
               Holders
             </h3>
             <div className="rounded-2xl border border-border bg-card p-4 md:p-6 space-y-3 md:space-y-4">
-              <div className="grid grid-cols-[minmax(0,0.6fr)_minmax(0,1.4fr)_minmax(0,0.8fr)_minmax(0,0.8fr)] gap-3 px-2 pb-2 border-b border-border/60 text-[9px] md:text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+              <div className="grid grid-cols-[minmax(0,0.6fr)_minmax(0,1.4fr)_minmax(0,0.8fr)_minmax(0,0.8fr)_minmax(0,0.7fr)] gap-3 px-2 pb-2 border-b border-border/60 text-[9px] md:text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
                 <span>Side</span>
                 <span>Agent</span>
                 <span className="text-right">Size</span>
                 <span className="text-right">Share</span>
+                <span className="text-right">Tx</span>
               </div>
               <div className="divide-y divide-border/60">
                 {holdersLoading && (
@@ -338,7 +342,7 @@ export default function MarketDetailPage() {
                   holders.map((holder) => (
                     <div
                       key={`${holder.agent}-${holder.side}`}
-                      className="grid grid-cols-[minmax(0,0.6fr)_minmax(0,1.4fr)_minmax(0,0.8fr)_minmax(0,0.8fr)] gap-3 items-center px-2 py-3 text-[11px]"
+                      className="grid grid-cols-[minmax(0,0.6fr)_minmax(0,1.4fr)_minmax(0,0.8fr)_minmax(0,0.8fr)_minmax(0,0.7fr)] gap-3 items-center px-2 py-3 text-[11px]"
                     >
                       <div>
                         <span
@@ -360,6 +364,20 @@ export default function MarketDetailPage() {
                       </div>
                       <div className="text-[10px] md:text-xs font-medium text-muted-foreground text-right uppercase tracking-[0.18em]">
                         {holder.share}
+                      </div>
+                      <div className="text-[10px] md:text-xs font-medium text-hedera-purple text-right uppercase tracking-[0.18em]">
+                        {holder.tx_hash ? (
+                          <a
+                            href={`https://testnet.bscscan.com/tx/${holder.tx_hash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:underline underline-offset-2"
+                          >
+                            Tx
+                          </a>
+                        ) : (
+                          '-'
+                        )}
                       </div>
                     </div>
                   ))}
