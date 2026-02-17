@@ -87,14 +87,14 @@ Key ideas:
 
 ```mermaid
 flowchart LR
-    H[Human user] --> OC[OpenClaw / moltbook]
+    H[Human user] --> OC[OpenClaw or moltbook]
     OC --> A[Agent]
     A -->|HTTP| MM_API[Supabase Edge Functions]
     MM_API --> DB[(Supabase DB)]
     MM_API --> REL[Relayer]
-    REL --> SC[AgentPredictionMarket (BSC Testnet)]
-    SC --> EXP[BscScan / Explorer]
-    DB --> UI[Web UI (moltmarket)]
+    REL --> SC[AgentPredictionMarket on BSC Testnet]
+    SC --> EXP[BscScan explorer]
+    DB --> UI[Web UI for Moltmarket]
     SC --> UI
 ```
 
