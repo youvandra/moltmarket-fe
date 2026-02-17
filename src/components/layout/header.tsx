@@ -4,26 +4,23 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { Search, Menu, X, ChevronRight, HelpCircle, TrendingUp, History, ArrowRight, Bot } from 'lucide-react';
+import {
+  Search,
+  Menu,
+  X,
+  ChevronRight,
+  HelpCircle,
+  TrendingUp,
+  History,
+  ArrowRight,
+  Bot,
+} from 'lucide-react';
 import { HowItWorksModal } from './how-it-works-modal';
 import { ThemeToggle } from './theme-toggle';
 import { cn } from '@/lib/utils';
-import { CATEGORIES, MOCK_MARKETS } from '@/lib/constants';
+import { CATEGORIES, MOCK_MARKETS, type Market } from '@/lib/constants';
 import { motion, AnimatePresence } from 'framer-motion';
-
-const RECOMMENDATIONS = [
-  "Bitcoin Price End of Month",
-  "moltmarket TVL Growth",
-  "Next SpaceX Launch",
-  "Premier League Winner",
-  "AI Regulation News"
-];
-
-const RECENT_SEARCHES = [
-  "Crypto",
-  "Politics",
-  "Sports"
-];
+import { supabase } from '@/lib/supabase';
 
 const FORUM_THREADS = [
   {
@@ -53,11 +50,107 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [recentSearches, setRecentSearches] = useState<string[]>(() => {
+    if (typeof window === 'undefined') return [];
+    try {
+      const stored = window.localStorage.getItem('molt_recent_searches');
+      if (!stored) return [];
+      const parsed = JSON.parse(stored) as string[];
+      return Array.isArray(parsed) ? parsed.slice(0, 5) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [trendingMarkets, setTrendingMarkets] = useState<Market[]>([]);
   const searchRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const router = useRouter();
 
   const normalizedQuery = searchQuery.trim().toLowerCase();
+
+  type DbMarket = {
+    id: string;
+    question: string;
+    description: string;
+    category: string;
+    image_url: string | null;
+    end_time: string;
+    initial_yes_price: number;
+    initial_liquidity: number;
+    status: string;
+    outcome: string | null;
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadTrendingMarkets() {
+      const { data, error } = await supabase
+        .from('markets')
+        .select(
+          'id, question, description, category, image_url, end_time, initial_yes_price, initial_liquidity, status, outcome',
+        )
+        .in('status', ['open', 'resolved'])
+        .order('initial_liquidity', { ascending: false })
+        .limit(3);
+
+      if (cancelled || error || !data) return;
+
+      const mapped: Market[] = (data as DbMarket[]).map((row) => {
+        const yesPrice =
+          typeof row.initial_yes_price === 'number' ? row.initial_yes_price : 0.5;
+        const noPrice = 1 - yesPrice;
+
+        return {
+          id: row.id,
+          question: row.question,
+          description: row.description,
+          category: row.category,
+          image: row.image_url || undefined,
+          volume: row.initial_liquidity != null ? String(row.initial_liquidity) : '0',
+          participants: 0,
+          endTime: row.end_time,
+          outcome: row.outcome,
+          outcomes: [
+            {
+              name: 'Yes',
+              probability: yesPrice,
+              price: yesPrice,
+            },
+            {
+              name: 'No',
+              probability: noPrice,
+              price: noPrice,
+            },
+          ],
+        };
+      });
+
+      setTrendingMarkets(mapped);
+    }
+
+    loadTrendingMarkets();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const addRecentSearch = (term: string) => {
+    const trimmed = term.trim();
+    if (!trimmed) return;
+    setRecentSearches((prev) => {
+      const next = [trimmed, ...prev.filter((t) => t.toLowerCase() !== trimmed.toLowerCase())];
+      const limited = next.slice(0, 5);
+      if (typeof window !== 'undefined') {
+        try {
+          window.localStorage.setItem('molt_recent_searches', JSON.stringify(limited));
+        } catch {
+        }
+      }
+      return limited;
+    });
+  };
 
   const marketResults = useMemo(() => {
     if (!normalizedQuery) return [];
@@ -191,19 +284,26 @@ export function Header() {
                               Recent
                             </h3>
                           </div>
-                          <div className="flex flex-wrap gap-2">
-                            {RECENT_SEARCHES.map((item) => (
-                              <button
-                                key={item}
-                                onClick={() => {
-                                  setSearchQuery(item);
-                                }}
-                                className="px-3 py-1.5 rounded-lg bg-muted/50 border border-border/50 text-[12px] font-medium hover:bg-muted transition-all"
-                              >
-                                {item}
-                              </button>
-                            ))}
-                          </div>
+                          {recentSearches.length > 0 ? (
+                            <div className="flex flex-wrap gap-2">
+                              {recentSearches.map((item) => (
+                                <button
+                                  key={item}
+                                  onClick={() => {
+                                    addRecentSearch(item);
+                                    setSearchQuery(item);
+                                  }}
+                                  className="px-3 py-1.5 rounded-lg bg-muted/50 border border-border/50 text-[12px] font-medium hover:bg-muted transition-all"
+                                >
+                                  {item}
+                                </button>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="px-1 text-[11px] text-muted-foreground">
+                              No recent searches yet.
+                            </p>
+                          )}
                         </div>
 
                         {/* Recommendations */}
@@ -215,20 +315,28 @@ export function Header() {
                             </h3>
                           </div>
                           <div className="grid grid-cols-1 gap-1">
-                            {RECOMMENDATIONS.map((text) => (
+                            {trendingMarkets.map((market) => (
                               <button
-                                key={text}
+                                key={market.id}
                                 onClick={() => {
-                                  setSearchQuery(text);
+                                  addRecentSearch(market.question);
+                                  setIsSearchFocused(false);
+                                  setSearchQuery('');
+                                  router.push(`/markets/${market.id}`);
                                 }}
                                 className="flex items-center justify-between p-3 rounded-xl bg-muted/20 border border-transparent hover:bg-muted/50 hover:border-border transition-all group text-left"
                               >
-                                <span className="text-[12px] font-bold text-foreground group-hover:text-hedera-purple transition-colors">
-                                  {text}
+                                <span className="text-[12px] font-bold text-foreground group-hover:text-hedera-purple transition-colors line-clamp-1">
+                                  {market.question}
                                 </span>
                                 <ArrowRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                               </button>
                             ))}
+                            {trendingMarkets.length === 0 && (
+                              <p className="px-1 text-[11px] text-muted-foreground">
+                                No markets available yet.
+                              </p>
+                            )}
                           </div>
                         </div>
                       </>
