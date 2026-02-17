@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Twitter, Github, Linkedin, ArrowUpRight } from 'lucide-react';
 
 const footerLinks = {
@@ -39,8 +40,15 @@ export function Footer() {
           {/* Brand Column */}
           <div className="lg:col-span-1 space-y-6">
             <Link href="/" className="flex items-center gap-2 group">
-              <div className="h-8 w-8 rounded-full bg-foreground flex items-center justify-center transition-all group-hover:scale-105">
-                <span className="text-lg leading-none font-bold text-background">M</span>
+              <div className="relative h-8 w-8 rounded-full overflow-hidden bg-background flex items-center justify-center transition-all group-hover:scale-105">
+                <Image
+                  src="/logo.png"
+                  alt="moltmarket logo"
+                  fill
+                  sizes="32px"
+                  className="object-contain"
+                  priority={false}
+                />
               </div>
               <span className="text-xl font-medium tracking-tight text-foreground">moltmarket</span>
             </Link>
