@@ -3,105 +3,67 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Twitter, Github, Linkedin, ArrowUpRight } from 'lucide-react';
-
-const footerLinks = {
-  platform: [
-    { name: 'Markets', href: '/markets' },
-    { name: 'Leaderboard', href: '/leaderboard' },
-    { name: 'Forum', href: '/forum' },
-    { name: 'Activity', href: '#' },
-  ],
-  developers: [
-    { name: 'Documentation', href: '/documentation' },
-    { name: 'Wallet', href: '#' },
-    { name: 'Smart Contracts', href: '#' },
-    { name: 'Bug Bounty', href: '#' },
-  ],
-  network: [
-    { name: 'Governance', href: '#' },
-    { name: 'Nodes', href: '#' },
-    { name: 'Staking', href: '#' },
-    { name: 'Dashboard', href: '#' },
-  ],
-  support: [
-    { name: 'Help Center', href: '#' },
-    { name: 'Community', href: '#' },
-    { name: 'Whitepaper', href: '#' },
-    { name: 'Contact Us', href: '#' },
-  ],
-};
+import { Github } from 'lucide-react';
 
 export function Footer() {
   return (
-    <footer className="mt-20 md:mt-40 border-t border-border bg-background py-12 md:py-20 transition-colors duration-150">
+    <footer className="mt-12 md:mt-20 border-t border-border bg-background py-6 md:py-8 transition-colors duration-150">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 md:gap-12 lg:gap-8 mb-16 md:mb-20">
-          {/* Brand Column */}
-          <div className="lg:col-span-1 space-y-6">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6">
+          <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2 group">
-              <div className="relative h-8 w-8 rounded-full overflow-hidden bg-background flex items-center justify-center transition-all group-hover:scale-105">
+              <div className="relative h-7 w-7 rounded-full overflow-hidden bg-background flex items-center justify-center transition-all group-hover:scale-105">
                 <Image
                   src="/logo.png"
                   alt="moltmarket logo"
                   fill
-                  sizes="32px"
+                  sizes="28px"
                   className="object-contain"
                   priority={false}
                 />
               </div>
-              <span className="text-xl font-medium tracking-tight text-foreground">moltmarket</span>
+              <span className="text-sm font-semibold tracking-[0.18em] uppercase text-foreground">
+                moltmarket
+              </span>
             </Link>
-            <p className="text-sm text-muted-foreground leading-relaxed pr-4">
-              Building agent-native prediction markets on the world's most sustainable network.
-            </p>
-            <div className="flex items-center gap-4">
-              <Link href="#" className="p-2 rounded-full bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-all">
-                <Twitter className="h-4 w-4" />
-              </Link>
-              <Link href="#" className="p-2 rounded-full bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-all">
-                <Github className="h-4 w-4" />
-              </Link>
-              <Link href="#" className="p-2 rounded-full bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-all">
-                <Linkedin className="h-4 w-4" />
-              </Link>
-            </div>
+            <Link
+              target="_blank"
+              href="https://github.com/youvandra/moltmarket-fe"
+              className="p-1.5 rounded-full bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-all"
+            >
+              <Github className="h-3.5 w-3.5" />
+            </Link>
           </div>
 
-          {/* Links Columns */}
-          {Object.entries(footerLinks).map(([category, links]) => (
-            <div key={category} className="space-y-6">
-              <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                {category}
-              </h4>
-              <ul className="space-y-4">
-                {links.map((link) => (
-                  <li key={link.name}>
-                    <Link 
-                      href={link.href} 
-                      className="group flex items-center gap-1 text-[13px] text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      {link.name}
-                      <ArrowUpRight className="h-3 w-3 opacity-0 -translate-y-1 translate-x-1 group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0 transition-all" />
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-
-        {/* Bottom Bar */}
-        <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex flex-wrap justify-center gap-8 text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-            <span>© 2026 moltmarket Labs</span>
-            <Link href="#" className="hover:text-foreground transition-colors">Privacy Policy</Link>
-            <Link href="#" className="hover:text-foreground transition-colors">Terms of Service</Link>
-            <Link href="#" className="hover:text-foreground transition-colors">Cookie Policy</Link>
+          <div className="flex flex-wrap justify-center gap-4 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            <Link href="/markets" className="hover:text-foreground transition-colors">
+              Markets
+            </Link>
+            <Link href="/leaderboard" className="hover:text-foreground transition-colors">
+              Leaderboard
+            </Link>
+            <Link href="/forum" className="hover:text-foreground transition-colors">
+              Forum
+            </Link>
+            <Link href="/#" className="hover:text-foreground transition-colors">
+              ~
+            </Link>
+            <Link href="/privacy-policy" className="hover:text-foreground transition-colors">
+              Privacy
+            </Link>
+            <Link href="/terms-of-service" className="hover:text-foreground transition-colors">
+              Terms
+            </Link>
+            <Link href="/cookie-policy" className="hover:text-foreground transition-colors">
+              Cookies
+            </Link>
           </div>
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-muted border border-border">
+
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted border border-border">
             <div className="h-1.5 w-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Network Status: Operational</span>
+            <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+              Testnet
+            </span>
           </div>
         </div>
       </div>
