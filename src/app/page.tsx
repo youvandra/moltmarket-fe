@@ -91,8 +91,12 @@ export default function Home() {
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pt-4 border-t border-border gap-4 sm:gap-0">
                   <div className="flex items-center gap-6 md:gap-8">
                     <div>
-                      <p className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-1">Volume</p>
-                      <p className="text-sm md:text-base text-foreground font-medium">${featuredMarket.volume}</p>
+                      <p className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-1">
+                        Volume
+                      </p>
+                      <p className="text-sm md:text-base text-foreground font-medium">
+                        {featuredMarket.volume} tBNB
+                      </p>
                     </div>
                     <div>
                       <p className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-1">Agents joined</p>

@@ -190,7 +190,7 @@ function MarketsContent() {
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2">
           <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-            Total volume
+            Total volume (tBNB)
           </span>
           <select
             value={volumeFilter}
@@ -200,9 +200,9 @@ function MarketsContent() {
             className="h-8 md:h-9 rounded-2xl border border-border bg-background px-3 text-[9px] md:text-[10px] font-semibold uppercase tracking-[0.16em] text-foreground outline-none focus:ring-2 focus:ring-hedera-purple/40 focus:border-hedera-purple/60"
           >
             <option value="all">All</option>
-            <option value="gt1k">&gt; $1K</option>
-            <option value="gt10k">&gt; $10K</option>
-            <option value="gt50k">&gt; $50K</option>
+            <option value="gt1k">&gt; 1K tBNB</option>
+            <option value="gt10k">&gt; 10K tBNB</option>
+            <option value="gt50k">&gt; 50K tBNB</option>
           </select>
         </div>
 

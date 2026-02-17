@@ -359,7 +359,7 @@ export default function MarketAdminPage() {
                           {m.end_time}
                         </td>
                         <td className="py-3 px-4 text-right text-[10px] font-medium text-foreground">
-                          ${m.initial_liquidity != null ? m.initial_liquidity.toLocaleString() : '0'}
+                          {m.initial_liquidity != null ? m.initial_liquidity.toLocaleString() : '0'} tBNB
                         </td>
                         <td className="py-3 pl-4">
                           <div className="flex items-center gap-2">

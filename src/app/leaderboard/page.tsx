@@ -144,7 +144,7 @@ export default function LeaderboardPage() {
                     Profit
                   </p>
                   <p className="text-xs md:text-lg font-bold text-emerald-500">
-                    ${topThree[1] ? topThree[1].total_profit.toLocaleString() : '0'}
+                    {topThree[1] ? topThree[1].total_profit.toLocaleString() : '0'} tBNB
                   </p>
                 </div>
                 <div className="hidden md:block">
@@ -152,7 +152,7 @@ export default function LeaderboardPage() {
                     Volume
                   </p>
                   <p className="text-lg font-bold">
-                    ${topThree[1] ? topThree[1].total_volume_trade.toLocaleString() : '0'}
+                    {topThree[1] ? topThree[1].total_volume_trade.toLocaleString() : '0'} tBNB
                   </p>
                 </div>
               </div>
@@ -196,7 +196,7 @@ export default function LeaderboardPage() {
                     Profit
                   </p>
                   <p className="text-xs md:text-lg font-bold text-emerald-400">
-                    ${topThree[0] ? topThree[0].total_profit.toLocaleString() : '0'}
+                    {topThree[0] ? topThree[0].total_profit.toLocaleString() : '0'} tBNB
                   </p>
                 </div>
                 <div className="hidden md:block">
@@ -204,7 +204,7 @@ export default function LeaderboardPage() {
                     Volume
                   </p>
                   <p className="text-lg font-bold">
-                    ${topThree[0] ? topThree[0].total_volume_trade.toLocaleString() : '0'}
+                    {topThree[0] ? topThree[0].total_volume_trade.toLocaleString() : '0'} tBNB
                   </p>
                 </div>
               </div>
@@ -245,7 +245,7 @@ export default function LeaderboardPage() {
                     Profit
                   </p>
                   <p className="text-xs md:text-lg font-bold text-emerald-500">
-                    ${topThree[2] ? topThree[2].total_profit.toLocaleString() : '0'}
+                    {topThree[2] ? topThree[2].total_profit.toLocaleString() : '0'} tBNB
                   </p>
                 </div>
                 <div className="hidden md:block">
@@ -253,7 +253,7 @@ export default function LeaderboardPage() {
                     Volume
                   </p>
                   <p className="text-lg font-bold">
-                    ${topThree[2] ? topThree[2].total_volume_trade.toLocaleString() : '0'}
+                    {topThree[2] ? topThree[2].total_volume_trade.toLocaleString() : '0'} tBNB
                   </p>
                 </div>
               </div>
@@ -316,13 +316,13 @@ export default function LeaderboardPage() {
                 <div>
                   <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-1">Profit</p>
                   <p className="text-sm font-bold text-emerald-500">
-                    ${trader.total_profit.toLocaleString()}
+                    {trader.total_profit.toLocaleString()} tBNB
                   </p>
                 </div>
                 <div>
                   <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-1">Volume</p>
                   <p className="text-sm font-bold text-foreground">
-                    ${trader.total_volume_trade.toLocaleString()}
+                    {trader.total_volume_trade.toLocaleString()} tBNB
                   </p>
                 </div>
               </div>
@@ -361,12 +361,12 @@ export default function LeaderboardPage() {
                   </td>
                   <td className="px-8 py-6">
                     <span className="text-sm font-bold text-emerald-500">
-                      ${trader.total_profit.toLocaleString()}
+                      {trader.total_profit.toLocaleString()} tBNB
                     </span>
                   </td>
                   <td className="px-8 py-6">
                     <span className="text-sm font-medium text-foreground">
-                      ${trader.total_volume_trade.toLocaleString()}
+                      {trader.total_volume_trade.toLocaleString()} tBNB
                     </span>
                   </td>
                   <td className="px-8 py-6 text-center">

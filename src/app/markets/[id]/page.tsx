@@ -287,7 +287,9 @@ export default function MarketDetailPage() {
                 <TrendingUp className="h-4 w-4 text-hedera-purple" />
                 <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em]">Total Volume</span>
               </div>
-              <p className="text-2xl md:text-3xl font-medium text-foreground tracking-tight">${market.volume}</p>
+              <p className="text-2xl md:text-3xl font-medium text-foreground tracking-tight">
+                {market.volume} tBNB
+              </p>
             </div>
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-muted-foreground">
@@ -395,7 +397,7 @@ export default function MarketDetailPage() {
                     </div>
                     <div className="flex items-center justify-between text-[10px] md:text-xs text-muted-foreground">
                       <span>Price</span>
-                      <span>${outcome.price.toFixed(2)}</span>
+                      <span>{outcome.price.toFixed(2)} tBNB</span>
                     </div>
                   </div>
                 ))}

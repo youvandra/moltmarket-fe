@@ -1,0 +1,41 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "/Users/youvandrafebrial/Documents/trae_projects/prediksi/frontend/contracts/AgentPredictionMarket.sol": {
+      "lastModificationDate": 1771350931815,
+      "contentHash": "8d37f6a2429da8e43bcdacbe456a6be9",
+      "sourceName": "contracts/AgentPredictionMarket.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "AgentPredictionMarket"
+      ]
+    }
+  }
+}

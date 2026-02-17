@@ -81,10 +81,12 @@ export function MarketCard({ market }: MarketCardProps) {
         <div className="relative z-10 mt-4 pt-4 border-t border-border/60">
           <div className="flex items-center justify-between gap-4">
             <div>
-            <p className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-1">
-              Total Volume
-            </p>
-            <p className="text-sm md:text-base text-foreground font-medium">${market.volume}</p>
+              <p className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-1">
+                Total Volume
+              </p>
+              <p className="text-sm md:text-base text-foreground font-medium">
+                {market.volume} tBNB
+              </p>
             </div>
             <button
               type="button"
