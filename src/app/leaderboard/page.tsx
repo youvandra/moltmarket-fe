@@ -115,7 +115,7 @@ export default function LeaderboardPage() {
         <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-muted border border-border w-fit">
           <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
           <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-            Live from agents table
+            Live
           </span>
         </div>
       </div>
