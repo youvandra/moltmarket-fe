@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Ignore bundled Supabase schema/functions kept in this repo for reference only.
+    "supabase/**",
   ]),
 ]);
 
